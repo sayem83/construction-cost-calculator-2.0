@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏗️ 2025 Construction Cost Calculator - Bangladesh (24 Materials)</title>
+    <title>🏗️ 2025 Construction Cost Calculator - Bangladesh (24 Materials + Daily Labor)</title>
     <style>
         * {
             margin: 0;
@@ -153,7 +153,11 @@
             color: #666;
             text-align: center;
             margin-top: -5px;
+            font-weight: bold;
         }
+
+        .daily-rate { border-left-color: #27ae60 !important; }
+        .daily-rate .rate-unit { color: #27ae60 !important; }
 
         select, input[type="number"], input[type="range"] {
             width: 100%;
@@ -198,7 +202,7 @@
             box-shadow: 0 10px 25px rgba(231, 76, 60, 0.4);
         }
 
-        /* Results styles (same as before) */
+        /* Results styles */
         .results { padding: 40px; display: none; }
         .results.show { display: block; animation: slideIn 0.5s ease-out; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
@@ -212,6 +216,7 @@
         .group-title { font-size: 1.5em; font-weight: bold; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 4px solid #3498db; color: #2c3e50; }
         .item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #eee; font-size: 1.1em; }
         .item:last-child { border-bottom: none; font-weight: bold; background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 20px; border-radius: 12px; color: #27ae60; font-size: 1.3em; margin-top: 10px; }
+        .labor-details { font-size: 0.9em; color: #666; margin-top: 5px; }
         .timeline-section { background: linear-gradient(135deg, #f39c12, #e67e22); color: white; padding: 30px; border-radius: 20px; text-align: center; margin: 30px 0; }
         .gantt-chart { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
         .gantt-item { background: rgba(255,255,255,0.3); padding: 12px 20px; border-radius: 25px; font-size: 0.9em; font-weight: bold; }
@@ -233,14 +238,14 @@
     <div class="container">
         <div class="header">
             <h1>🏗️ 2025 Construction Cost Calculator</h1>
-            <p>চট্টগ্রাম সহ সম্পূর্ণ বাংলাদেশ | ২৪টি Material Custom Rates</p>
+            <p>চট্টগ্রাম সহ সম্পূর্ণ বাংলাদেশ | ২৪টি Material + Daily Labor Rates</p>
         </div>
 
         <div class="input-section">
             <div class="input-tabs">
                 <button class="tab-btn active" onclick="switchTab('basic')">Basic</button>
                 <button class="tab-btn" onclick="switchTab('advanced')">Advanced</button>
-                <button class="tab-btn" onclick="switchTab('custom')">💰 Custom (24 Materials)</button>
+                <button class="tab-btn" onclick="switchTab('custom')">💰 Custom (24 Materials + Daily Labor)</button>
             </div>
 
             <div id="basic-tab" class="input-grid">
@@ -274,7 +279,7 @@
                     <label for="locationMultiplier">📍 Location (2025)</label>
                     <select id="locationMultiplier">
                         <option value="1.10">Dhaka City (110%)</option>
-                        <option value="0.95">Chattogram City (95%)</option>
+                        <option value="0.95" selected>Chattogram City (95%)</option>
                         <option value="0.85">Dhaka Suburb (85%)</option>
                         <option value="0.78">Divisional City (78%)</option>
                         <option value="0.68">Chattogram Suburb (68%)</option>
@@ -304,7 +309,7 @@
                     <div class="custom-rates-grid" id="customRatesGrid"></div>
                 </div>
                 <div class="input-field full-width">
-                    <label>👷 2025 Custom Labor Rates</label>
+                    <label>👷 2025 Daily Labor Rates (৮ ধরন)</label>
                     <div class="custom-rates-grid" id="customLaborGrid"></div>
                 </div>
                 <button class="calculate-btn" onclick="calculateCost()">✨ Calculate Custom 2025</button>
@@ -351,9 +356,10 @@
                     <div id="totalMaterials"></div>
                 </div>
                 <div class="card">
-                    <div class="group-title">👷 2025 Labor Breakdown</div>
+                    <div class="group-title">👷 2025 Daily Labor Breakdown (৮ ধরন)</div>
                     <div id="laborList"></div>
                     <div id="totalLabor"></div>
+                    <div id="laborManDays"></div>
                 </div>
                 <div class="card">
                     <div class="group-title">📊 2025 Additional Costs</div>
@@ -369,13 +375,13 @@
             // Foundation Materials
             bricks: { qty: 5.2, rate: 16, name: 'ব্রিক' },
             sand: { qty: 0.022, rate: 2200, name: 'বালি' },
-            cement: { qty: 0.062, rate: 680, name: 'সিমেন্ট (OPC)' },
+                        cement: { qty: 0.062, rate: 680, name: 'সিমেন্ট (OPC)' },
             stone: { qty: 0.020, rate: 2900, name: 'স্টোন চিপস' },
             
             // Steel & Structure
             iron12mm: { qty: 1.2, rate: 125, name: '১২mm রড' },
             iron16mm: { qty: 0.8, rate: 125, name: '১৬mm রড' },
-                        iron20mm: { qty: 0.2, rate: 125, name: '২০mm রড' },
+            iron20mm: { qty: 0.2, rate: 125, name: '২০mm রড' },
             
             // Concrete & Masonry
             crushed_stone: { qty: 0.015, rate: 2800, name: 'ক্রাশড স্টোন' },
@@ -407,16 +413,16 @@
             ac_sheet: { qty: 0.08, rate: 125, name: 'এসি শিট' }
         };
 
-        // 2025 Labor Rates (BDT per sqft)
+        // 2025 DAILY Labor Rates (BDT per DAY per worker)
         let customLabor = {
-            mason: { rate: 520, name: 'মিস্ত্রি' },
-            barbender: { rate: 290, name: 'বারবেন্ডার' },
-            carpenter: { rate: 210, name: 'কার্পেন্টার' },
-            electrician: { rate: 155, name: 'ইলেকট্রিশিয়ান' },
-            plumber: { rate: 95, name: 'প্লাম্বার' },
-            painter: { rate: 175, name: 'পেইন্টার' },
-            tile_mason: { rate: 185, name: 'টাইল মিস্ত্রি' },
-            helper: { rate: 195, name: 'হেল্পার' }
+            mason: { rate: 1200, name: 'মিস্ত্রি', mandays: 0.12 },
+            barbender: { rate: 950, name: 'বারবেন্ডার', mandays: 0.08 },
+            carpenter: { rate: 1100, name: 'কার্পেন্টার', mandays: 0.09 },
+            electrician: { rate: 1050, name: 'ইলেকট্রিশিয়ান', mandays: 0.06 },
+            plumber: { rate: 900, name: 'প্লাম্বার', mandays: 0.05 },
+            painter: { rate: 850, name: 'পেইন্টার', mandays: 0.07 },
+            tile_mason: { rate: 1000, name: 'টাইল মিস্ত্রি', mandays: 0.08 },
+            helper: { rate: 650, name: 'হেল্পার', mandays: 0.15 }
         };
 
         let currentTab = 'basic';
@@ -442,10 +448,12 @@
             for (let key in customLabor) {
                 const item = customLabor[key];
                 laborHtml += `
-                    <div class="rate-item">
+                    <div class="rate-item daily-rate">
                         <label>${item.name}</label>
-                        <input type="number" id="lab_${key}_rate" value="${item.rate}" min="0" step="5" placeholder="Rate">
-                        <span class="rate-unit">৳/sqft</span>
+                        <input type="number" id="lab_${key}_rate" value="${item.rate}" min="0" step="50" placeholder="Daily Rate">
+                        <span class="rate-unit">৳/দিন/জন</span>
+                        <input type="number" id="lab_${key}_mandays" value="${item.mandays}" step="0.01" min="0" placeholder="Man-days">
+                        <span class="rate-unit">/sqft</span>
                     </div>
                 `;
             }
@@ -501,25 +509,30 @@
             };
 
             customLabor = {
-                mason: { rate: 520, name: 'মিস্ত্রি' },
-                barbender: { rate: 290, name: 'বারবেন্ডার' },
-                carpenter: { rate: 210, name: 'কার্পেন্টার' },
-                electrician: { rate: 155, name: 'ইলেকট্রিশিয়ান' },
-                plumber: { rate: 95, name: 'প্লাম্বার' },
-                painter: { rate: 175, name: 'পেইন্টার' },
-                tile_mason: { rate: 185, name: 'টাইল মিস্ত্রি' },
-                helper: { rate: 195, name: 'হেল্পার' }
+                mason: { rate: 1200, name: 'মিস্ত্রি', mandays: 0.12 },
+                barbender: { rate: 950, name: 'বারবেন্ডার', mandays: 0.08 },
+                carpenter: { rate: 1100, name: 'কার্পেন্টার', mandays: 0.09 },
+                electrician: { rate: 1050, name: 'ইলেকট্রিশিয়ান', mandays: 0.06 },
+                plumber: { rate: 900, name: 'প্লাম্বার', mandays: 0.05 },
+                painter: { rate: 850, name: 'পেইন্টার', mandays: 0.07 },
+                tile_mason: { rate: 1000, name: 'টাইল মিস্ত্রি', mandays: 0.08 },
+                helper: { rate: 650, name: 'হেল্পার', mandays: 0.15 }
             };
 
             createCustomRatesUI();
-            alert('✅ 2025 Default Rates Restored!');
+            alert('✅ 2025 Default Daily Rates Restored!\n👷 ৮ ধরনের লেবার: প্রতিদিনের দর + Man-days');
         }
 
         function calculateCost() {
-            let area;
-            if (currentTab === 'basic') area = parseFloat(document.getElementById('area').value);
-            else if (currentTab === 'advanced') area = parseFloat(document.getElementById('areaAdv').value);
-            else area = parseFloat(document.getElementById('customArea').value);
+            let area, floors = 3;
+            if (currentTab === 'basic') {
+                area = parseFloat(document.getElementById('area').value);
+                floors = parseInt(document.getElementById('floors').value);
+            } else if (currentTab === 'advanced') {
+                area = parseFloat(document.getElementById('areaAdv').value);
+            } else {
+                area = parseFloat(document.getElementById('customArea').value);
+            }
 
             if (!area || area < 100) {
                 alert('দয়া করে সঠিক এরিয়া দিন (ন্যূনতম ১০০ স্কয়ার ফুট)');
@@ -534,17 +547,17 @@
                 }
                 for (let key in customLabor) {
                     customLabor[key].rate = parseFloat(document.getElementById(`lab_${key}_rate`).value) || 0;
+                    customLabor[key].mandays = parseFloat(document.getElementById(`lab_${key}_mandays`).value) || 0;
                 }
             }
 
             // Multipliers
-            let materialMultiplier = 1.0, laborMultiplier = 1.0, locationMultiplier = 1.0, inflationMultiplier = 1.0, floors = 3;
+            let materialMultiplier = 1.0, laborMultiplier = 1.0, locationMultiplier = 1.0, inflationMultiplier = 1.0;
             
             if (currentTab === 'basic') {
                 const quality = document.getElementById('quality').value;
                 materialMultiplier = quality === 'premium' ? 1.3 : quality === 'normal' ? 0.82 : 1.0;
                 laborMultiplier = quality === 'premium' ? 1.2 : quality === 'normal' ? 0.88 : 1.0;
-                floors = parseInt(document.getElementById('floors').value);
             } else if (currentTab === 'advanced') {
                 locationMultiplier = parseFloat(document.getElementById('locationMultiplier').value);
                 inflationMultiplier = 1 + (parseInt(document.getElementById('inflationRate').value) / 100);
@@ -566,17 +579,25 @@
                 `;
             }
 
-            // Calculate Labor (8 types)
+            // Calculate DAILY Labor (8 types) - NEW FORMULA
             let totalLabor = 0;
+            let totalManDays = 0;
             let laborHtml = '';
             for (let key in customLabor) {
                 const item = customLabor[key];
-                const cost = item.rate * area * laborMultiplier * locationMultiplier * inflationMultiplier * floors * 0.28;
-                totalLabor += cost;
+                const manDaysPerSqft = item.mandays;
+                const totalManDaysForProject = manDaysPerSqft * area * floors;
+                const laborCost = totalManDaysForProject * item.rate * laborMultiplier * locationMultiplier * inflationMultiplier;
+                totalLabor += laborCost;
+                totalManDays += totalManDaysForProject;
+                
                 laborHtml += `
                     <div class="item">
-                        <span>${item.name}: ${formatNumber(item.rate)}৳/sqft</span>
-                        <span>${formatNumber(cost)}৳</span>
+                        <span>${item.name}</span>
+                        <span>${formatNumber(laborCost)}৳</span>
+                        <div class="labor-details">
+                            ${totalManDaysForProject.toFixed(0)} man-days × ${formatNumber(item.rate)}৳/day
+                        </div>
                     </div>
                 `;
             }
@@ -603,7 +624,11 @@
             document.getElementById('materialsList').innerHTML = materialsHtml;
             document.getElementById('totalMaterials').innerHTML = `<div class="item"><span>💰 মোট ম্যাটেরিয়াল (২৪ Items)</span><span>${formatNumber(totalMaterials)}৳</span></div>`;
             document.getElementById('laborList').innerHTML = laborHtml;
-            document.getElementById('totalLabor').innerHTML = `<div class="item"><span>💰 মোট লেবার (৮ Types)</span><span>${formatNumber(totalLabor)}৳</span></div>`;
+            document.getElementById('totalLabor').innerHTML = `<div class="item"><span>💰 মোট লেবার (৮ ধরন)</span><span>${formatNumber(totalLabor)}৳</span></div>`;
+            document.getElementById('laborManDays').innerHTML = `<div class="item" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white; border-radius: 12px; padding: 15px;">
+                <span>👥 মোট Man-Days: ${totalManDays.toFixed(0)}</span>
+                <span>${Math.round(totalManDays/days)} জন/দিন (${days} দিন)</span>
+            </div>`;
             
             document.getElementById('totalCost').textContent = formatNumber(grandTotal) + ' ৳';
             document.getElementById('costPerSqft').innerHTML = `<strong>${costPerSqft} ৳/স্কয়ারফুট (২০২৫)</strong>`;
@@ -613,16 +638,16 @@
             document.getElementById('savings').textContent = savings + '%';
             
             document.getElementById('qualityIndicator').innerHTML = `<div class="quality-badge ${quality.toLowerCase()}">${quality} কোয়ালিটি ২০২৫</div>`;
-            document.getElementById('timelineTitle').innerHTML = `⏱️ ২০২৫ নির্মাণ সময়: ${days} দিন (${months} মাস)`;
+            document.getElementById('timelineTitle').innerHTML = `⏱️ ২০২৫ নির্মাণ সময়: ${days} দিন (${months} মাস) | ${Math.round(totalManDays/days)} জন/দিন`;
             document.getElementById('ganttChart').innerHTML = `
-                <div class="gantt-item">🏗️ ফাউন্ডেশন: ${Math.ceil(days*0.22)} দিন</div>
+                                <div class="gantt-item">🏗️ ফাউন্ডেশন: ${Math.ceil(days*0.22)} দিন</div>
                 <div class="gantt-item">🔨 স্ট্রাকচার: ${Math.ceil(days*0.38)} দিন</div>
                 <div class="gantt-item">⚡ ইলেকট্রিক: ${Math.ceil(days*0.18)} দিন</div>
                 <div class="gantt-item">🪚 ফিনিশিং: ${Math.ceil(days*0.22)} দিন</div>
             `;
 
             document.getElementById('finalBreakdown').innerHTML = `
-                <div class="item"><span>🏗️ মৌলিক খরচ (২৪+৮)</span><span>${formatNumber(baseCost)}৳</span></div>
+                <div class="item"><span>🏗️ মৌলিক খরচ (২৪ Materials + ৮ Labor)</span><span>${formatNumber(baseCost)}৳</span></div>
                 <div class="item"><span>📐 আর্কিটেক্ট (৫.৫%)</span><span>${formatNumber(architectFee)}৳</span></div>
                 <div class="item"><span>🏛️ RAJUK/সরকারি (৩%)</span><span>${formatNumber(govtFee)}৳</span></div>
                 <div class="item"><span>💼 কন্ট্রাক্টর (১৩%)</span><span>${formatNumber(contractorProfit)}৳</span></div>
@@ -646,7 +671,7 @@
         }
 
         document.addEventListener('keypress', function(e) {
-                        if (e.key === 'Enter') {
+            if (e.key === 'Enter') {
                 const activeInput = document.activeElement;
                 if (activeInput.type === 'number') {
                     calculateCost();
@@ -676,7 +701,7 @@
             // Update range display
             document.getElementById('inflationRate').dispatchEvent(new Event('input'));
 
-            // Initial calculation with 2025 rates
+            // Initial calculation with 2025 Daily Labor rates
             setTimeout(() => {
                 calculateCost();
             }, 1000);
@@ -684,9 +709,10 @@
 
         // Performance optimization for large lists
         console.log('🚀 2025 Construction Calculator Loaded Successfully!');
-        console.log('✅ 24 Materials + 8 Labor Types');
+        console.log('✅ 24 Materials + 8 Daily Labor Types');
         console.log('✅ Chattogram Rates Included');
-        console.log('✅ Fully Customizable');
+        console.log('✅ Labor: Daily Rate × Man-days × Floors');
+        console.log('✅ Fully Customizable with Man-days control');
     </script>
 </body>
 </html>
