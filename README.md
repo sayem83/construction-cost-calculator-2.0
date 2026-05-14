@@ -1,989 +1,1561 @@
-<html lang="bn" data-theme="light">
+<html lang="bn">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>নির্মাণ হিসাব v4.0 — Bangladesh Construction Estimator</title>
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>নির্মাণ হিসাব ৩.০ — Bangladesh Construction Estimator Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Tiro+Bangla:ital@0;1&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-/* ===== THEME ===== */
-[data-theme="light"] {
-  --bg: #f0f4f1; --bg-card: #ffffff; --bg-sidebar: #0f3d22;
-  --bg-input: #f5f7f5; --text: #1a2e20; --text-muted: #5a7060;
-  --border: #d0dcd4; --border-light: #e8f0ea;
-  --sidebar-text: #b8d4be; --sidebar-active: rgba(255,255,255,0.12);
-}
-[data-theme="dark"] {
-  --bg: #0d1f13; --bg-card: #162a1c; --bg-sidebar: #071209;
-  --bg-input: #1e3325; --text: #d4f0dc; --text-muted: #7aab85;
-  --border: #2a4a32; --border-light: #1e3325;
-  --sidebar-text: #7aab85; --sidebar-active: rgba(255,255,255,0.08);
-}
+/* ===== DESIGN TOKENS ===== */
 :root {
-  --primary: #1a6b3a; --primary-light: #2d9653; --primary-dark: #0f4526;
-  --accent: #e8a020; --accent-dark: #c47d0a;
-  --success: #22c55e; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6;
-  --shadow: 0 2px 12px rgba(0,0,0,0.08); --shadow-lg: 0 8px 32px rgba(0,0,0,0.14);
-  --radius: 12px; --radius-sm: 8px;
+  --green-950: #052212;
+  --green-900: #0a3d1f;
+  --green-800: #0f5429;
+  --green-700: #166534;
+  --green-600: #16a34a;
+  --green-500: #22c55e;
+  --green-400: #4ade80;
+  --green-100: #dcfce7;
+  --green-50:  #f0fdf4;
+  --amber-600: #d97706;
+  --amber-500: #f59e0b;
+  --amber-400: #fbbf24;
+  --amber-100: #fef3c7;
+  --sky-600:   #0284c7;
+  --sky-500:   #0ea5e9;
+  --sky-100:   #e0f2fe;
+  --red-600:   #dc2626;
+  --red-100:   #fee2e2;
+  --purple-600:#7c3aed;
+  --purple-100:#ede9fe;
+  --teal-600:  #0d9488;
+  --teal-100:  #ccfbf1;
+  --neutral-950:#0a0f0b;
+  --neutral-900:#111714;
+  --neutral-800:#1a2419;
+  --neutral-700:#2d3b2c;
+  --neutral-600:#3f5440;
+  --neutral-500:#5a7a5c;
+  --neutral-400:#7a9e7c;
+  --neutral-300:#a8c5aa;
+  --neutral-200:#cde0ce;
+  --neutral-100:#e8f3e9;
+  --neutral-50: #f4faf5;
+  --white:      #ffffff;
+  --surface:    #f2f7f2;
+  --surface-2:  #e8f3e9;
+  --card-bg:    #ffffff;
+  --border:     #d4e4d5;
+  --border-2:   #b8d4b9;
+  --text-primary:   #0d1f0e;
+  --text-secondary: #3d5c3e;
+  --text-muted:     #6b8f6d;
+  --text-faint:     #9ab89c;
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg:  0 10px 30px rgba(0,0,0,0.10), 0 4px 8px rgba(0,0,0,0.04);
+  --shadow-xl:  0 20px 50px rgba(0,0,0,0.14);
+  --radius-xs:  4px;
+  --radius-sm:  8px;
+  --radius-md:  12px;
+  --radius-lg:  16px;
+  --radius-xl:  20px;
+  --sidebar-w:  272px;
+  --header-h:   64px;
+  --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+  --font-display: 'Tiro Bangla', serif;
+  --font-body:    'Hind Siliguri', sans-serif;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s, color 0.2s; }
-body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-/* Layout */
-.app { display: flex; min-height: 100vh; }
-.sidebar { width: 260px; background: var(--bg-sidebar); color: var(--sidebar-text); flex-shrink: 0; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
-.main { flex: 1; overflow-x: hidden; }
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--surface);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
 
-/* Sidebar */
-.logo { padding: 20px 20px 14px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-.logo-title { font-size: 17px; font-weight: 700; color: #fff; }
-.logo-sub { font-size: 10px; color: #6b9e77; margin-top: 2px; }
-.nav { padding: 10px 0; flex: 1; }
-.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 18px; cursor: pointer; border-left: 3px solid transparent; font-size: 13px; color: var(--sidebar-text); transition: all 0.15s; }
-.nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
-.nav-item.active { background: var(--sidebar-active); border-left-color: var(--accent); color: #fff; font-weight: 600; }
-.nav-section { padding: 10px 18px 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #4a7a55; }
-.nav-badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 9px; padding: 1px 6px; border-radius: 10px; font-weight: 700; }
-.sidebar-footer { padding: 12px 18px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; color: #4a7a55; }
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--neutral-100); }
+::-webkit-scrollbar-thumb { background: var(--neutral-300); border-radius: 10px; }
 
-/* Header */
-.header { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-.header-left h1 { font-size: 18px; font-weight: 700; color: var(--primary-dark); }
-.header-left p { font-size: 12px; color: var(--text-muted); }
-.header-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.btn { padding: 7px 14px; border-radius: var(--radius-sm); border: none; cursor: pointer; font-family: inherit; font-size: 12px; font-weight: 600; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px; }
-.btn-primary { background: var(--primary); color: #fff; }
-.btn-primary:hover { background: var(--primary-light); }
-.btn-accent { background: var(--accent); color: #fff; }
-.btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
-.btn-outline:hover { background: var(--primary); color: #fff; }
-.btn-sm { padding: 5px 10px; font-size: 11px; }
-.btn-danger { background: var(--danger); color: #fff; }
-.btn-info { background: var(--info); color: #fff; }
+/* ===== LAYOUT ===== */
+.app { display: flex; min-height: 100vh; position: relative; }
 
-/* Summary bar */
-.summary-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 16px 24px 0; }
-.stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; position: relative; overflow: hidden; }
-.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
-.stat-card.green::before { background: var(--primary); }
-.stat-card.amber::before { background: var(--accent); }
-.stat-card.blue::before { background: var(--info); }
-.stat-card.red::before { background: var(--danger); }
-.stat-card.purple::before { background: #8b5cf6; }
-.stat-label { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; }
-.stat-value { font-size: 18px; font-weight: 700; color: var(--primary-dark); line-height: 1.1; }
-.stat-sub { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: var(--sidebar-w);
+  background: linear-gradient(180deg, var(--green-950) 0%, var(--green-900) 60%, #071c10 100%);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 300;
+  transition: transform var(--transition);
+  box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+}
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 200px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(34,197,94,0.15), transparent 70%);
+  pointer-events: none;
+}
+.sidebar-logo {
+  padding: 28px 22px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  position: relative;
+}
+.logo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.logo-icon-wrap {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--green-600), var(--green-400));
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 4px 12px rgba(34,197,94,0.4);
+}
+.logo-title { font-size: 18px; font-weight: 700; color: #fff; line-height: 1.1; font-family: var(--font-display); }
+.logo-sub { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 6px; }
+.logo-version { display: inline-block; background: var(--amber-500); color: var(--neutral-950); font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 10px; letter-spacing: 0.05em; }
 
-/* Content */
-.content { padding: 20px 24px; }
+.nav-section { padding: 6px 0; }
+.nav-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.25);
+  padding: 10px 22px 4px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 22px;
+  cursor: pointer;
+  color: rgba(255,255,255,0.55);
+  font-size: 13.5px;
+  border-left: 3px solid transparent;
+  transition: all var(--transition);
+  position: relative;
+  border-radius: 0;
+}
+.nav-item:hover { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.05); }
+.nav-item.active {
+  color: #fff;
+  background: rgba(34,197,94,0.12);
+  border-left-color: var(--green-400);
+  font-weight: 600;
+}
+.nav-item.active .nav-icon { color: var(--green-400); }
+.nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+.nav-badge {
+  margin-left: auto;
+  background: var(--amber-500);
+  color: #000;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px 22px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  font-size: 10.5px;
+  color: rgba(255,255,255,0.3);
+  line-height: 1.7;
+}
+.bnbc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(34,197,94,0.15);
+  color: var(--green-400);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 10px;
+  margin-bottom: 6px;
+}
+
+/* ===== MAIN CONTENT ===== */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: margin-left var(--transition);
+}
+
+/* ===== TOPBAR ===== */
+.topbar {
+  height: var(--header-h);
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: var(--shadow-sm);
+  gap: 12px;
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.hamburger {
+  display: none;
+  width: 36px; height: 36px;
+  border: none;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 18px;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  flex-shrink: 0;
+  transition: background var(--transition);
+}
+.hamburger:hover { background: var(--neutral-200); }
+.topbar-title h1 { font-size: 16px; font-weight: 700; color: var(--text-primary); white-space: nowrap; }
+.topbar-title p { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+/* ===== BUTTONS ===== */
+.btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 8px 14px;
+  border: none; border-radius: var(--radius-sm);
+  font-family: var(--font-body); font-size: 12.5px; font-weight: 600;
+  cursor: pointer; transition: all var(--transition); white-space: nowrap;
+  text-decoration: none;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--green-700); color: #fff; }
+.btn-primary:hover { background: var(--green-600); box-shadow: 0 4px 12px rgba(22,163,74,0.35); }
+.btn-accent { background: var(--amber-500); color: var(--neutral-950); }
+.btn-accent:hover { background: var(--amber-400); box-shadow: 0 4px 12px rgba(245,158,11,0.35); }
+.btn-outline { background: transparent; color: var(--green-700); border: 1.5px solid var(--border-2); }
+.btn-outline:hover { background: var(--green-50); border-color: var(--green-600); }
+.btn-ghost { background: var(--surface); color: var(--text-secondary); }
+.btn-ghost:hover { background: var(--neutral-200); }
+.btn-danger { background: var(--red-600); color: #fff; }
+.btn-info { background: var(--sky-600); color: #fff; }
+.btn-sm { padding: 5px 10px; font-size: 11.5px; }
+.btn-xs { padding: 3px 8px; font-size: 11px; }
+.btn-icon {
+  width: 32px; height: 32px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-sm);
+}
+
+/* ===== CURRENCY TABS ===== */
+.cur-group { display: flex; background: var(--surface); border-radius: var(--radius-sm); padding: 3px; border: 1px solid var(--border); }
+.cur-btn { padding: 4px 10px; border: none; background: transparent; cursor: pointer; font-family: var(--font-body); font-size: 12px; font-weight: 600; color: var(--text-muted); border-radius: var(--radius-xs); transition: all var(--transition); }
+.cur-btn.active { background: var(--green-700); color: #fff; box-shadow: var(--shadow-sm); }
+
+/* ===== SUMMARY STRIP ===== */
+.summary-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.strip-item {
+  background: var(--card-bg);
+  padding: 14px 20px;
+  display: flex; align-items: center; gap: 12px;
+  transition: background var(--transition);
+}
+.strip-item:hover { background: var(--green-50); }
+.strip-icon {
+  width: 38px; height: 38px;
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.si-green { background: var(--green-100); }
+.si-amber { background: var(--amber-100); }
+.si-sky   { background: var(--sky-100); }
+.si-red   { background: var(--red-100); }
+.strip-info { min-width: 0; }
+.strip-label { font-size: 10.5px; color: var(--text-muted); font-weight: 500; }
+.strip-value { font-size: 17px; font-weight: 700; color: var(--text-primary); line-height: 1.2; white-space: nowrap; }
+.strip-sub { font-size: 10px; color: var(--text-faint); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ===== CONTENT ===== */
+.content { padding: 24px 28px; flex: 1; }
 .section { display: none; }
 .section.active { display: block; }
+.section-intro { display: flex; align-items: flex-start; gap: 12px; background: linear-gradient(135deg, var(--green-50), #fff); border: 1px solid var(--green-100); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 20px; }
+.section-intro-icon { font-size: 24px; line-height: 1; flex-shrink: 0; }
+.section-intro h3 { font-size: 14px; font-weight: 700; color: var(--green-800); margin-bottom: 2px; }
+.section-intro p { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
 
-/* Cards */
-.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 22px; margin-bottom: 18px; }
-.card-title { font-size: 15px; font-weight: 700; color: var(--primary-dark); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid var(--border-light); }
-.card-title .badge { font-size: 10px; background: var(--primary); color: #fff; padding: 2px 7px; border-radius: 20px; }
-.card-title .badge-warn { font-size: 10px; background: var(--warning); color: #fff; padding: 2px 7px; border-radius: 20px; }
+/* ===== CARDS ===== */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 22px 0;
+  margin-bottom: 16px;
+}
+.card-title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 700; color: var(--text-primary);
+}
+.card-title-icon {
+  width: 28px; height: 28px;
+  background: var(--green-100);
+  border-radius: var(--radius-xs);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+.card-body { padding: 0 22px 20px; }
+.card-divider { height: 1px; background: var(--border); margin: 16px 0; }
+.chip { display: inline-flex; align-items: center; gap: 3px; background: var(--green-100); color: var(--green-800); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+.chip-amber { background: var(--amber-100); color: #92400e; }
+.chip-sky { background: var(--sky-100); color: #075985; }
 
-/* Grid */
+/* ===== FORM ELEMENTS ===== */
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-
-/* Form */
-.form-group { display: flex; flex-direction: column; gap: 5px; }
-.form-group label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
-.form-group select, .form-group input[type=text], .form-group input[type=number] {
-  padding: 8px 10px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-  font-family: inherit; font-size: 13px; color: var(--text); background: var(--bg-input);
-  outline: none; transition: border-color 0.2s; width: 100%;
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+.fgroup { display: flex; flex-direction: column; gap: 5px; }
+.fgroup label { font-size: 11.5px; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
+.fgroup select,
+.fgroup input[type=number],
+.fgroup input[type=text] {
+  padding: 9px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--surface);
+  outline: none;
+  transition: all var(--transition);
+  width: 100%;
 }
-.form-group select:focus, .form-group input:focus { border-color: var(--primary); background: var(--bg-card); }
-.form-group textarea { padding: 8px 10px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; color: var(--text); background: var(--bg-input); outline: none; resize: vertical; }
-.hint { font-size: 10px; color: var(--text-muted); }
+.fgroup select:focus,
+.fgroup input:focus {
+  border-color: var(--green-600);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(22,163,74,0.1);
+}
+.fgroup input.is-error { border-color: var(--red-600); background: #fff5f5; }
+.fgroup .hint { font-size: 10.5px; color: var(--text-faint); }
+.fgroup .err { font-size: 10.5px; color: var(--red-600); display: none; }
+.fgroup input.is-error ~ .err { display: block; }
 
-/* Material table */
-.mat-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.mat-table th { background: var(--bg); padding: 8px 12px; text-align: left; font-weight: 700; color: var(--text-muted); font-size: 11px; border-bottom: 1px solid var(--border); }
-.mat-table td { padding: 9px 12px; border-bottom: 1px solid var(--border-light); color: var(--text); }
-.mat-table tr:hover td { background: var(--bg); }
-.mat-table .amt { font-weight: 700; color: var(--primary-dark); text-align: right; }
+/* ===== ALERT ===== */
+.alert { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px; border-radius: var(--radius-sm); font-size: 12.5px; margin-bottom: 16px; }
+.alert-info    { background: var(--sky-100);    border: 1px solid #7dd3fc; color: #0c4a6e; }
+.alert-success { background: var(--green-100);  border: 1px solid #86efac; color: var(--green-800); }
+.alert-warning { background: var(--amber-100);  border: 1px solid #fcd34d; color: #78350f; }
+.alert-purple  { background: var(--purple-100); border: 1px solid #c4b5fd; color: #4c1d95; }
 
-/* Labor */
-.labor-row { display: grid; grid-template-columns: 2fr 80px 100px 80px 110px 40px; gap: 8px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border-light); font-size: 12px; }
-.labor-row input { padding: 5px 7px; border: 1px solid var(--border); border-radius: 5px; font-family: inherit; font-size: 12px; color: var(--text); background: var(--bg-input); width: 100%; }
-.labor-total-cell { font-weight: 700; color: var(--primary-dark); font-size: 12px; }
+/* ===== TIMELINE BLOCK ===== */
+.timeline-wrap {
+  position: relative;
+  margin: 8px 0;
+}
+.timeline-track {
+  height: 14px;
+  background: var(--neutral-100);
+  border-radius: 7px;
+  overflow: hidden;
+  position: relative;
+}
+.timeline-fill {
+  height: 100%;
+  border-radius: 7px;
+  background: linear-gradient(90deg, var(--green-700), var(--green-500), var(--amber-500));
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+}
+.timeline-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+  animation: shimmer 2s infinite;
+}
+@keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+.timeline-milestones {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 0;
+  margin-top: 10px;
+}
+.milestone { text-align: center; padding: 8px 4px; }
+.milestone-name { font-size: 10px; font-weight: 600; color: var(--text-muted); }
+.milestone-time { font-size: 12px; font-weight: 700; color: var(--text-primary); margin-top: 2px; }
+.milestone-pct { font-size: 9px; color: var(--text-faint); }
 
-/* Feature grid */
-.feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.feature-item { display: flex; flex-direction: column; gap: 4px; padding: 10px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; font-size: 12px; background: var(--bg-card); }
-.feature-item:hover { border-color: var(--primary); }
-.feature-item.selected { border-color: var(--primary); background: #e8f5eb; }
-[data-theme="dark"] .feature-item.selected { background: #0d2e16; }
-.feature-item-top { display: flex; align-items: center; gap: 6px; }
-.feature-cost { font-size: 10px; color: var(--text-muted); padding-left: 20px; }
+/* ===== LABOR TABLE ===== */
+.labor-table { width: 100%; border-collapse: collapse; }
+.labor-table thead th {
+  background: var(--surface);
+  padding: 9px 12px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--border);
+}
+.labor-table tbody tr { border-bottom: 1px solid var(--neutral-100); transition: background var(--transition); }
+.labor-table tbody tr:hover { background: var(--green-50); }
+.labor-table td { padding: 8px 10px; font-size: 13px; }
+.labor-table input {
+  width: 100%;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  background: transparent;
+  color: var(--text-primary);
+  transition: all var(--transition);
+}
+.labor-table input:focus { border-color: var(--green-600); background: #fff; outline: none; box-shadow: 0 0 0 2px rgba(22,163,74,0.1); }
+.labor-role-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 20px;
+  font-size: 10.5px; font-weight: 600;
+}
+.tag-master { background: #fef3c7; color: #92400e; }
+.tag-skilled { background: var(--green-100); color: var(--green-800); }
+.tag-semi { background: var(--sky-100); color: #075985; }
+.tag-helper { background: var(--neutral-100); color: var(--neutral-700); }
+.tag-engineer { background: var(--purple-100); color: #4c1d95; }
+.labor-cost-cell { font-weight: 700; color: var(--green-700); text-align: right; font-size: 12.5px; }
+.del-btn {
+  width: 26px; height: 26px;
+  background: var(--red-100); color: var(--red-600);
+  border: none; border-radius: var(--radius-xs);
+  cursor: pointer; font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition);
+}
+.del-btn:hover { background: var(--red-600); color: #fff; }
 
-/* Alert */
-.alert { padding: 10px 14px; border-radius: var(--radius-sm); font-size: 12px; margin-bottom: 14px; display: flex; align-items: flex-start; gap: 8px; }
-.alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
-.alert-warning { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
-.alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #14532d; }
-.alert-danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
-[data-theme="dark"] .alert-info { background: #1e3a5f; border-color: #2563eb; color: #93c5fd; }
-[data-theme="dark"] .alert-success { background: #0d2e16; border-color: #16a34a; color: #86efac; }
+/* ===== LABOR IMPACT INDICATOR ===== */
+.labor-impact {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 12px;
+  margin-top: 16px;
+}
+.impact-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+.impact-card::before { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; }
+.ic-green::before  { background: var(--green-500); }
+.ic-amber::before  { background: var(--amber-500); }
+.ic-sky::before    { background: var(--sky-500); }
+.impact-label { font-size: 10.5px; color: var(--text-muted); font-weight: 500; }
+.impact-value { font-size: 22px; font-weight: 700; color: var(--text-primary); line-height: 1.2; margin: 4px 0 2px; }
+.impact-change { font-size: 10px; padding: 2px 6px; border-radius: 10px; }
+.ic-up { background: var(--green-100); color: var(--green-700); }
+.ic-down { background: var(--red-100); color: var(--red-600); }
 
-/* Checklist */
-.checklist-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); margin-bottom: 6px; background: var(--bg-card); transition: all 0.2s; }
-.checklist-item.done { background: #f0fdf4; border-color: #bbf7d0; opacity: 0.8; }
-[data-theme="dark"] .checklist-item.done { background: #0d2e16; border-color: #16a34a; }
-.checklist-item input[type=checkbox] { margin-top: 2px; accent-color: var(--primary); transform: scale(1.2); flex-shrink: 0; }
-.checklist-label { font-size: 13px; flex: 1; }
-.checklist-label.done-text { text-decoration: line-through; color: var(--text-muted); }
-.checklist-phase { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+/* ===== FEATURE GRID ===== */
+.feature-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.feat-item {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.feat-item:hover { border-color: var(--green-500); background: var(--green-50); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.feat-item.selected { border-color: var(--green-600); background: linear-gradient(135deg, var(--green-50), #fff); box-shadow: 0 0 0 2px rgba(22,163,74,0.15); }
+.feat-top { display: flex; align-items: center; gap: 7px; }
+.feat-chk { accent-color: var(--green-600); width: 14px; height: 14px; flex-shrink: 0; cursor: pointer; }
+.feat-name { font-size: 12px; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
+.feat-bottom { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.feat-cost { font-size: 11px; color: var(--text-muted); }
+.feat-cost strong { color: var(--green-700); font-weight: 700; }
+.feat-qty-input {
+  width: 52px; padding: 3px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  font-size: 11px;
+  font-family: var(--font-body);
+  background: #fff;
+  color: var(--text-primary);
+}
+.feat-qty-input:focus { outline: none; border-color: var(--green-500); }
 
-/* Project comparison table */
-.compare-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.compare-table th { background: var(--primary); color: #fff; padding: 10px 14px; text-align: left; }
-.compare-table td { padding: 9px 14px; border-bottom: 1px solid var(--border-light); color: var(--text); }
-.compare-table tr:hover td { background: var(--bg); }
-.compare-table .best { color: var(--success); font-weight: 700; }
-.compare-table .worst { color: var(--danger); font-weight: 700; }
+/* ===== MATERIAL TABLE ===== */
+.mat-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.mat-table thead th {
+  background: var(--surface);
+  padding: 9px 14px;
+  text-align: left;
+  font-size: 10.5px; font-weight: 700;
+  color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--border);
+}
+.mat-table tbody tr { border-bottom: 1px solid var(--neutral-100); }
+.mat-table tbody tr:hover { background: var(--green-50); }
+.mat-table td { padding: 9px 14px; }
+.mat-amount { font-weight: 700; color: var(--green-700); text-align: right; }
+.mat-qty { color: var(--text-muted); }
+.mat-total-row { background: linear-gradient(135deg, var(--green-50), #fff) !important; }
+.mat-total-row td { font-weight: 700; color: var(--green-800); border-top: 2px solid var(--green-200); }
 
-/* Price trend */
-.price-trend-chart { position: relative; width: 100%; height: 220px; }
+/* ===== FEE ROWS ===== */
+.fee-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--neutral-100); font-size: 13px; }
+.fee-row:last-child { border-bottom: none; }
+.fee-row .fee-label { color: var(--text-secondary); }
+.fee-row .fee-val { font-weight: 700; color: var(--text-primary); }
+.fee-row.total-row { padding-top: 14px; margin-top: 4px; border-top: 2px solid var(--green-200); border-bottom: none; }
+.fee-row.total-row .fee-label { font-weight: 700; font-size: 14px; color: var(--text-primary); }
+.fee-row.total-row .fee-val { font-size: 16px; color: var(--green-700); }
 
-/* Contract */
-.milestone-row { display: grid; grid-template-columns: 2fr 1fr 1fr 120px; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-light); font-size: 12px; }
-.milestone-row input, .milestone-row select { padding: 5px 7px; border: 1px solid var(--border); border-radius: 5px; font-family: inherit; font-size: 12px; color: var(--text); background: var(--bg-input); width: 100%; }
-.status-badge { padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; }
-.status-pending { background: #fef3c7; color: #92400e; }
-.status-ongoing { background: #dbeafe; color: #1e40af; }
-.status-done { background: #dcfce7; color: #14532d; }
+/* ===== BREAKDOWN ===== */
+.breakdown-row { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--neutral-100); font-size: 13px; gap: 8px; }
+.breakdown-row:last-child { border-bottom: none; }
+.breakdown-row .br-label { color: var(--text-secondary); flex: 1; }
+.breakdown-row .br-val { font-weight: 600; color: var(--text-primary); flex-shrink: 0; }
+.breakdown-total { border-top: 2px solid var(--green-300); border-bottom: none !important; padding-top: 12px !important; margin-top: 4px; }
+.breakdown-total .br-label { font-weight: 700; font-size: 15px; color: var(--text-primary); }
+.breakdown-total .br-val { font-size: 18px; color: var(--green-700); font-weight: 800; }
 
-/* Floor finishing */
-.floor-finish-row { display: grid; grid-template-columns: 80px 1fr 1fr 1fr 120px; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-light); font-size: 12px; }
-.floor-finish-row select { padding: 5px 7px; border: 1px solid var(--border); border-radius: 5px; font-family: inherit; font-size: 12px; background: var(--bg-input); color: var(--text); width: 100%; }
+/* ===== LOAN CARD ===== */
+.loan-result {
+  background: linear-gradient(135deg, var(--green-50), #fff);
+  border: 1px solid var(--green-200);
+  border-radius: var(--radius-sm);
+  padding: 16px 18px;
+  margin-top: 14px;
+  position: relative; overflow: hidden;
+}
+.loan-result::before {
+  content: '৳';
+  position: absolute; right: 14px; top: 10px;
+  font-size: 60px; color: var(--green-100); font-weight: 700;
+  line-height: 1; pointer-events: none;
+}
+.loan-emi { font-size: 28px; font-weight: 800; color: var(--green-700); line-height: 1; }
+.loan-meta { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
 
-/* AI chat */
-.ai-chat-box { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-.ai-messages { min-height: 250px; max-height: 400px; overflow-y: auto; padding: 16px; background: var(--bg); display: flex; flex-direction: column; gap: 10px; }
-.ai-msg { padding: 10px 14px; border-radius: 10px; font-size: 13px; line-height: 1.6; max-width: 85%; }
-.ai-msg.user { background: var(--primary); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
-.ai-msg.bot { background: var(--bg-card); border: 1px solid var(--border); align-self: flex-start; border-bottom-left-radius: 4px; color: var(--text); }
-.ai-msg.typing { color: var(--text-muted); font-style: italic; }
-.ai-input-row { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--border); background: var(--bg-card); }
-.ai-input-row input { flex: 1; padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 20px; font-family: inherit; font-size: 13px; background: var(--bg-input); color: var(--text); outline: none; }
-.ai-input-row input:focus { border-color: var(--primary); }
-
-/* Badge system */
-.badge-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.badge-item { text-align: center; padding: 16px 12px; border: 1.5px solid var(--border); border-radius: var(--radius); }
-.badge-item.earned { border-color: var(--accent); background: #fffbeb; }
-[data-theme="dark"] .badge-item.earned { background: #2a1f00; }
-.badge-icon { font-size: 32px; margin-bottom: 6px; }
-.badge-name { font-size: 12px; font-weight: 700; color: var(--text); }
-.badge-desc { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
-.badge-item.locked .badge-icon { filter: grayscale(1); opacity: 0.4; }
-.badge-item.locked .badge-name { color: var(--text-muted); }
-
-/* Theme toggle */
-.theme-toggle { width: 44px; height: 22px; border-radius: 11px; background: var(--border); position: relative; cursor: pointer; transition: background 0.3s; border: none; flex-shrink: 0; }
-.theme-toggle.dark { background: var(--primary); }
-.theme-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform 0.3s; }
-.theme-toggle.dark::after { transform: translateX(22px); }
-
-/* BOQ */
-.boq-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.boq-table th { background: var(--primary-dark); color: #fff; padding: 9px 12px; text-align: left; font-size: 11px; }
-.boq-table td { padding: 8px 12px; border-bottom: 1px solid var(--border-light); color: var(--text); }
-.boq-table .section-row td { background: var(--bg); font-weight: 700; font-size: 12px; color: var(--primary-dark); }
-.boq-table .total-row td { background: var(--primary-dark); color: #fff; font-weight: 700; }
-
-/* Weather card */
-.weather-card { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-.w-item { text-align: center; padding: 14px 10px; background: var(--bg); border-radius: var(--radius-sm); border: 1px solid var(--border-light); }
-.w-icon { font-size: 28px; margin-bottom: 4px; }
-.w-label { font-size: 11px; color: var(--text-muted); }
-.w-val { font-size: 15px; font-weight: 700; color: var(--text); }
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #b0cbb8; border-radius: 3px; }
-
-/* Range */
-input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 2px; background: var(--border); }
-input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--primary); cursor: pointer; }
-
-.currency-toggle { display: flex; gap: 4px; }
-.cur-btn { padding: 5px 10px; border-radius: 16px; border: 1.5px solid var(--border); background: transparent; cursor: pointer; font-family: inherit; font-size: 11px; font-weight: 600; color: var(--text-muted); }
-.cur-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-
-.breakdown-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-light); font-size: 13px; }
-.breakdown-row.total { font-weight: 700; font-size: 15px; color: var(--primary-dark); border-top: 2px solid var(--primary); border-bottom: none; padding-top: 10px; margin-top: 4px; }
-
-.loan-result { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-sm); padding: 14px; margin-top: 10px; }
-[data-theme="dark"] .loan-result { background: #0d2e16; border-color: #16a34a; }
-.loan-result .monthly { font-size: 26px; font-weight: 700; color: var(--primary); }
-
-.fee-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border-light); font-size: 13px; }
-.fee-row:last-child { font-weight: 700; border-bottom: none; }
-
-.report-header { text-align: center; padding: 20px; background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: #fff; border-radius: var(--radius); margin-bottom: 16px; }
-
+/* ===== CHART WRAP ===== */
 .chart-wrap { position: relative; width: 100%; }
 
-/* Progress bar */
-.progress-bar-wrap { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin: 6px 0; }
-.progress-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+/* ===== LAW TABLE ===== */
+.law-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.law-table th { background: var(--green-800); color: #fff; padding: 10px 14px; text-align: left; font-weight: 600; font-size: 11px; }
+.law-table tr:nth-child(even) { background: var(--green-50); }
+.law-table td { padding: 9px 14px; border-bottom: 1px solid var(--border); color: var(--text-secondary); line-height: 1.5; }
+.law-table td:first-child { font-weight: 700; color: var(--text-primary); width: 220px; }
+.law-tag {
+  display: inline-block;
+  padding: 2px 7px; border-radius: 10px;
+  font-size: 10px; font-weight: 700; margin-left: 4px;
+}
+.lt-mandatory { background: var(--red-100); color: var(--red-600); }
+.lt-recommended { background: var(--amber-100); color: #92400e; }
+.lt-optional { background: var(--sky-100); color: #075985; }
 
-/* Tabs within section */
-.inner-tabs { display: flex; gap: 4px; margin-bottom: 14px; flex-wrap: wrap; }
-.inner-tab { padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: transparent; cursor: pointer; font-family: inherit; font-size: 12px; font-weight: 500; color: var(--text-muted); }
-.inner-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+/* ===== REPORT ===== */
+.report-banner {
+  background: linear-gradient(135deg, var(--green-900) 0%, var(--green-700) 100%);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  margin-bottom: 20px;
+  color: #fff;
+  position: relative; overflow: hidden;
+}
+.report-banner::before {
+  content: '🏗️';
+  position: absolute; right: 24px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 80px; opacity: 0.1;
+}
+.report-banner h2 { font-size: 22px; font-weight: 700; font-family: var(--font-display); margin-bottom: 4px; }
+.report-banner p { font-size: 13px; opacity: 0.7; }
+.report-pills { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.r-pill {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.9);
+}
+
+/* ===== DONUT LEGEND ===== */
+.legend-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 12px; }
+.legend-item { display: flex; align-items: center; gap: 7px; font-size: 11.5px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+.legend-pct { font-weight: 700; color: var(--text-primary); }
+.legend-name { color: var(--text-muted); }
+
+/* ===== OVERLAY & MODAL ===== */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 250; backdrop-filter: blur(2px); }
+.overlay.show { display: block; }
+.modal-wrap { display: none; position: fixed; inset: 0; z-index: 400; align-items: center; justify-content: center; padding: 20px; }
+.modal-wrap.show { display: flex; }
+.modal {
+  background: var(--card-bg);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  width: 100%; max-width: 540px;
+  max-height: 85vh; overflow-y: auto;
+  box-shadow: var(--shadow-xl);
+  animation: modalIn 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes modalIn { from{transform:scale(0.95);opacity:0} to{transform:scale(1);opacity:1} }
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.modal-header h2 { font-size: 17px; font-weight: 700; color: var(--text-primary); }
+.modal-close { width: 30px; height: 30px; border: none; background: var(--surface); border-radius: var(--radius-xs); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+.project-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.project-card:hover { border-color: var(--green-500); background: var(--green-50); }
+.project-name { font-weight: 700; font-size: 14px; color: var(--text-primary); }
+.project-meta { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+.project-actions { display: flex; gap: 6px; margin-top: 10px; }
+
+/* ===== RANGE SLIDER ===== */
+input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 5px; background: var(--border); border-radius: 10px; outline: none; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--green-600); border: 3px solid #fff; box-shadow: 0 0 0 2px var(--green-600), var(--shadow-sm); cursor: pointer; }
+
+/* ===== SECTION TABS (for sub-navigation) ===== */
+.sub-tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px; margin-bottom: 18px; flex-wrap: wrap; }
+.sub-tab { padding: 6px 14px; border: none; background: transparent; border-radius: var(--radius-xs); cursor: pointer; font-family: var(--font-body); font-size: 12.5px; font-weight: 500; color: var(--text-muted); transition: all var(--transition); }
+.sub-tab.active { background: var(--card-bg); color: var(--green-700); font-weight: 700; box-shadow: var(--shadow-sm); }
+
+/* ===== LAW SECTION ===== */
+.law-category { margin-bottom: 20px; }
+.law-category-header { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--green-800); color: #fff; border-radius: var(--radius-sm) var(--radius-sm) 0 0; font-size: 13px; font-weight: 700; }
+.law-category-body { border: 1px solid var(--border); border-top: none; border-radius: 0 0 var(--radius-sm) var(--radius-sm); overflow: hidden; }
+
+/* ===== ENV TABLE ===== */
+.env-table { width: 100%; font-size: 13px; border-collapse: collapse; }
+.env-table td { padding: 8px 12px; border-bottom: 1px solid var(--neutral-100); }
+.env-table tr:last-child td { border-bottom: none; border-top: 2px solid var(--green-200); font-weight: 700; padding-top: 12px; }
+.env-table .ev-label { color: var(--text-muted); width: 200px; }
+.env-table .ev-val { font-weight: 700; color: var(--text-primary); }
+
+/* ===== MOBILE ===== */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(calc(-1 * var(--sidebar-w))); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .hamburger { display: flex; }
+  .summary-strip { grid-template-columns: 1fr 1fr; }
+  .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
+  .feature-grid { grid-template-columns: 1fr 1fr; }
+  .labor-impact { grid-template-columns: 1fr; }
+  .content { padding: 16px; }
+  .topbar { padding: 0 16px; }
+  .cur-group { display: none; }
+  .timeline-milestones { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 540px) {
+  .summary-strip { grid-template-columns: 1fr; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .feature-grid { grid-template-columns: 1fr; }
+  .legend-grid { grid-template-columns: 1fr 1fr; }
+  .report-banner { padding: 20px; }
+}
 
 @media print {
-  .sidebar, .header-right, .btn, .summary-bar { display: none !important; }
-  body { font-size: 12px; }
+  .sidebar, .hamburger, .topbar-right, .btn, .summary-strip { display: none !important; }
+  .main { margin-left: 0 !important; }
+  .topbar { display: none !important; }
 }
 </style>
 </head>
 <body>
-<div class="app">
+<!-- Overlay -->
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
-<!-- ===== SIDEBAR ===== -->
-<div class="sidebar">
-  <div class="logo">
-    <div style="font-size:24px; margin-bottom:4px;">🏗️</div>
-    <div class="logo-title">নির্মাণ হিসাব</div>
-    <div class="logo-sub">Bangladesh Construction Estimator v4.0</div>
+<!-- Load Project Modal -->
+<div class="modal-wrap" id="loadModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>📂 সেভ করা প্রজেক্ট</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="projects-list"></div>
   </div>
-  <div class="nav">
-    <div class="nav-section">মূল ইনপুট</div>
-    <div class="nav-item active" onclick="showSection('location')">📍 লোকেশন ও পরিবেশ</div>
-    <div class="nav-item" onclick="showSection('building')">🏢 বিল্ডিং কনফিগারেশন</div>
-    <div class="nav-item" onclick="showSection('materials')">🧱 ম্যাটেরিয়াল টেকঅফ</div>
-    <div class="nav-item" onclick="showSection('labor')">👷 শ্রমিক ও যন্ত্রপাতি</div>
-    <div class="nav-item" onclick="showSection('extras')">⚡ অতিরিক্ত সুবিধা</div>
-    <div class="nav-item" onclick="showSection('floorfinish')">🏠 তলা অনুযায়ী ফিনিশিং <span class="nav-badge">নতুন</span></div>
-    <div class="nav-section">স্পেশাল</div>
-    <div class="nav-item" onclick="showSection('special')">⭐ স্পেশাল ফিচারস</div>
-    <div class="nav-item" onclick="showSection('financial')">💰 আর্থিক ও সরকারি ফি</div>
-    <div class="nav-item" onclick="showSection('boq')">📋 BOQ জেনারেটর <span class="nav-badge">নতুন</span></div>
-    <div class="nav-item" onclick="showSection('contract')">📑 কন্ট্রাক্ট ম্যানেজমেন্ট <span class="nav-badge">নতুন</span></div>
-    <div class="nav-section">বিশ্লেষণ</div>
-    <div class="nav-item" onclick="showSection('ai')">🤖 AI সাজেশন <span class="nav-badge">নতুন</span></div>
-    <div class="nav-item" onclick="showSection('prices')">📈 মূল্য ট্রেন্ড <span class="nav-badge">নতুন</span></div>
-    <div class="nav-item" onclick="showSection('weather')">🌤️ আবহাওয়া ও বিলম্ব <span class="nav-badge">নতুন</span></div>
-    <div class="nav-item" onclick="showSection('checklist')">✅ কোয়ালিটি চেকলিস্ট <span class="nav-badge">নতুন</span></div>
-    <div class="nav-item" onclick="showSection('compare')">📊 মাল্টি-প্রজেক্ট তুলনা <span class="nav-badge">নতুন</span></div>
-    <div class="nav-item" onclick="showSection('badges')">🏅 গেমিফিকেশন ব্যাজ <span class="nav-badge">নতুন</span></div>
-    <div class="nav-item" onclick="showSection('report')">📄 রিপোর্ট ও QR কোড</div>
+</div>
+
+<div class="app">
+<!-- ===== SIDEBAR ===== -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-badge">
+      <div class="logo-icon-wrap">🏗️</div>
+      <div>
+        <div class="logo-title">নির্মাণ হিসাব</div>
+        <div><span class="logo-version">v3.0 PRO</span></div>
+      </div>
+    </div>
+    <div class="logo-sub">Bangladesh Construction Estimator</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">প্রধান মডিউল</div>
+    <div class="nav-item active" onclick="showSection('location')"><span class="nav-icon">📍</span> লোকেশন ও পরিবেশ</div>
+    <div class="nav-item" onclick="showSection('building')"><span class="nav-icon">🏢</span> বিল্ডিং কনফিগারেশন<span class="nav-badge">৪০+</span></div>
+    <div class="nav-item" onclick="showSection('materials')"><span class="nav-icon">🧱</span> ম্যাটেরিয়াল টেকঅফ</div>
+    <div class="nav-item" onclick="showSection('labor')"><span class="nav-icon">👷</span> শ্রমিক ও টাইমলাইন<span class="nav-badge">লাইভ</span></div>
+    <div class="nav-item" onclick="showSection('extras')"><span class="nav-icon">⚡</span> অতিরিক্ত সুবিধা<span class="nav-badge">৫০+</span></div>
+    <div class="nav-item" onclick="showSection('financial')"><span class="nav-icon">💰</span> আর্থিক ও সরকারি ফি</div>
+    <div class="nav-item" onclick="showSection('special')"><span class="nav-icon">⭐</span> স্পেশাল ফিচারস<span class="nav-badge">৫০+</span></div>
+    <div class="nav-label">রিপোর্ট ও আইন</div>
+    <div class="nav-item" onclick="showSection('laws')"><span class="nav-icon">⚖️</span> বাংলাদেশ নির্মাণ আইন</div>
+    <div class="nav-item" onclick="showSection('report')"><span class="nav-icon">📊</span> রিপোর্ট ও বিশ্লেষণ</div>
   </div>
   <div class="sidebar-footer">
-    BNBC ২০২০ | রাজউক অনুমোদিত<br>
-    <span id="save-indicator" style="color:#6b9e77;">● অটো-সেভ চালু</span>
+    <div class="bnbc-badge">⚡ BNBC 2020 অনুসরণ</div><br>
+    রাজউক | PWD | BGMEA অনুমোদিত<br>
+    সূত্র: রাজউক CWR | PWD SOR 2023
   </div>
 </div>
 
 <!-- ===== MAIN ===== -->
-<div class="main">
-  <!-- Header -->
-  <div class="header">
-    <div class="header-left">
-      <h1 id="page-title">লোকেশন ও পরিবেশ</h1>
-      <p id="page-sub">এলাকা নির্বাচন করুন</p>
+<div class="main" id="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <div class="topbar-title">
+        <h1 id="page-title">লোকেশন ও পরিবেশ</h1>
+        <p id="page-sub">এলাকা নির্বাচন করুন — কস্ট ফ্যাক্টর স্বয়ংক্রিয়ভাবে প্রযোজ্য হবে</p>
+      </div>
     </div>
-    <div class="header-right">
-      <div class="currency-toggle">
+    <div class="topbar-right">
+      <div class="cur-group">
         <button class="cur-btn active" onclick="setCurrency('BDT',this)">৳ BDT</button>
         <button class="cur-btn" onclick="setCurrency('USD',this)">$ USD</button>
         <button class="cur-btn" onclick="setCurrency('INR',this)">₹ INR</button>
       </div>
-      <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()"></button>
-      <button class="btn btn-outline btn-sm" onclick="saveProject()">💾 সেভ</button>
-      <button class="btn btn-outline btn-sm" onclick="loadProject()">📂 লোড</button>
+      <button class="btn btn-ghost btn-sm" onclick="openLoadModal()">📂 লোড</button>
+      <button class="btn btn-primary btn-sm" onclick="saveProject()">💾 সেভ</button>
       <button class="btn btn-accent btn-sm" onclick="showSection('report')">📊 রিপোর্ট</button>
     </div>
   </div>
 
-  <!-- Summary Bar -->
-  <div class="summary-bar">
-    <div class="stat-card green">
-      <div class="stat-label">মোট নির্মাণ খরচ</div>
-      <div class="stat-value" id="total-cost">৳ ০</div>
-      <div class="stat-sub" id="cost-per-sqft">প্রতি sqft: ৳ ০</div>
+  <!-- SUMMARY STRIP -->
+  <div class="summary-strip">
+    <div class="strip-item">
+      <div class="strip-icon si-green">💰</div>
+      <div class="strip-info">
+        <div class="strip-label">মোট নির্মাণ খরচ</div>
+        <div class="strip-value" id="total-cost">৳ ০</div>
+        <div class="strip-sub" id="cost-per-sqft">প্রতি sqft: ৳ ০</div>
+      </div>
     </div>
-    <div class="stat-card amber">
-      <div class="stat-label">নির্মাণ সময়</div>
-      <div class="stat-value" id="construction-time">০ মাস</div>
-      <div class="stat-sub" id="manday-info">ম্যান-ডে: ০</div>
+    <div class="strip-item">
+      <div class="strip-icon si-amber">⏱️</div>
+      <div class="strip-info">
+        <div class="strip-label">নির্মাণ সময়কাল</div>
+        <div class="strip-value" id="construction-time">০ মাস</div>
+        <div class="strip-sub" id="manday-info">ম্যান-ডে: ০</div>
+      </div>
     </div>
-    <div class="stat-card blue">
-      <div class="stat-label">পরিবেশ ফ্যাক্টর</div>
-      <div class="stat-value" id="area-factor">১.০০</div>
-      <div class="stat-sub" id="zone-info">জোন: —</div>
+    <div class="strip-item">
+      <div class="strip-icon si-sky">🌍</div>
+      <div class="strip-info">
+        <div class="strip-label">পরিবেশ ফ্যাক্টর</div>
+        <div class="strip-value" id="area-factor">১.০০</div>
+        <div class="strip-sub" id="zone-info">জোন: —</div>
+      </div>
     </div>
-    <div class="stat-card red">
-      <div class="stat-label">সরকারি ফি+ভ্যাট</div>
-      <div class="stat-value" id="govt-cost">৳ ০</div>
-      <div class="stat-sub">রাজউক+ওয়াসা</div>
-    </div>
-    <div class="stat-card purple">
-      <div class="stat-label">প্রজেক্ট স্কোর</div>
-      <div class="stat-value" id="project-score">০/১০০</div>
-      <div class="stat-sub" id="score-label">হিসাব শুরু করুন</div>
+    <div class="strip-item">
+      <div class="strip-icon si-red">🏛️</div>
+      <div class="strip-info">
+        <div class="strip-label">সরকারি ফি + চার্জ</div>
+        <div class="strip-value" id="govt-cost">৳ ০</div>
+        <div class="strip-sub">ভ্যাট + রাজউক + ওয়াসা</div>
+      </div>
     </div>
   </div>
 
+  <!-- ===== CONTENT ===== -->
   <div class="content">
-
-    <!-- ====== LOCATION ====== -->
+    <!-- ===== LOCATION ===== -->
     <div class="section active" id="section-location">
+      <div class="section-intro">
+        <div class="section-intro-icon">📍</div>
+        <div>
+          <h3>লোকেশন ও পরিবেশ ফ্যাক্টর</h3>
+          <p>বিভাগ → জেলা → উপজেলা নির্বাচন করুন। প্রতিটি এলাকার জন্য BNBC ২০২০ অনুযায়ী পৃথক কস্ট ফ্যাক্টর প্রযোজ্য হবে। পার্বত্য এলাকায় +২০%, সমুদ্র উপকূলে +৭%, হাওরে +১২%।</p>
+        </div>
+      </div>
       <div class="card">
-        <div class="card-title">🗺️ লোকেশন নির্বাচন <span class="badge">৬৪ জেলা | ৪৯৫+ উপজেলা</span></div>
-        <div class="grid-3">
-          <div class="form-group"><label>বিভাগ</label>
-            <select id="division" onchange="updateDistricts()">
-              <option value="">-- বিভাগ --</option>
-              <option value="dhaka">ঢাকা</option><option value="chittagong">চট্টগ্রাম</option>
-              <option value="rajshahi">রাজশাহী</option><option value="khulna">খুলনা</option>
-              <option value="barisal">বরিশাল</option><option value="sylhet">সিলেট</option>
-              <option value="rangpur">রংপুর</option><option value="mymensingh">ময়মনসিংহ</option>
-            </select>
-          </div>
-          <div class="form-group"><label>জেলা</label>
-            <select id="district" onchange="updateUpazilas()"><option value="">-- জেলা --</option></select>
-          </div>
-          <div class="form-group"><label>উপজেলা/থানা</label>
-            <select id="upazila" onchange="recalculate()"><option value="">-- উপজেলা --</option></select>
-          </div>
+        <div class="card-header">
+          <div class="card-title"><div class="card-title-icon">🗺️</div> লোকেশন নির্বাচন <span class="chip">৬৪ জেলা | ৪৯৫+ উপজেলা</span></div>
         </div>
-        <div class="grid-3" style="margin-top:12px;">
-          <div class="form-group"><label>এলাকার ধরণ</label>
-            <select id="area-type" onchange="recalculate()">
-              <option value="1.35">মেট্রো কোর (ঢাকা/চট্টগ্রাম)</option>
-              <option value="1.15">সাব-আরবান</option>
-              <option value="1.0" selected>শহর (স্ট্যান্ডার্ড)</option>
-              <option value="0.85">উপজেলা সদর</option>
-              <option value="0.68">গ্রামীণ</option>
-            </select>
+        <div class="card-body">
+          <div class="grid-3">
+            <div class="fgroup"><label>বিভাগ</label>
+              <select id="division" onchange="updateDistricts()">
+                <option value="">-- বিভাগ নির্বাচন --</option>
+                <option value="dhaka">ঢাকা বিভাগ</option>
+                <option value="chittagong">চট্টগ্রাম বিভাগ</option>
+                <option value="rajshahi">রাজশাহী বিভাগ</option>
+                <option value="khulna">খুলনা বিভাগ</option>
+                <option value="barisal">বরিশাল বিভাগ</option>
+                <option value="sylhet">সিলেট বিভাগ</option>
+                <option value="rangpur">রংপুর বিভাগ</option>
+                <option value="mymensingh">ময়মনসিংহ বিভাগ</option>
+              </select>
+            </div>
+            <div class="fgroup"><label>জেলা</label><select id="district" onchange="updateUpazilas()"><option value="">-- জেলা নির্বাচন --</option></select></div>
+            <div class="fgroup"><label>উপজেলা / থানা</label><select id="upazila" onchange="onUpazilaChange()"><option value="">-- উপজেলা --</option></select></div>
           </div>
-          <div class="form-group"><label>ভূমিকম্প জোন (BNBC ২০২০)</label>
-            <select id="seismic-zone" onchange="recalculate()">
-              <option value="1.0">জোন-১ (কম) — খুলনা, বরিশাল</option>
-              <option value="1.05" selected>জোন-২ (মাঝারি) — ঢাকা, চট্টগ্রাম</option>
-              <option value="1.10">জোন-৩ (বেশি) — রাজশাহী, রংপুর</option>
-              <option value="1.15">জোন-৪ (অতি বেশি) — সিলেট</option>
-            </select>
+          <div class="card-divider"></div>
+          <div class="grid-3">
+            <div class="fgroup"><label>এলাকার ধরণ</label>
+              <select id="area-type" onchange="recalculate()">
+                <option value="1.35">মেট্রো কোর (ঢাকা/চট্টগ্রাম সিটি)</option>
+                <option value="1.15">সাব-আরবান (শহরতলী)</option>
+                <option value="1.0" selected>শহর (জেলা সদর)</option>
+                <option value="0.85">উপজেলা সদর</option>
+                <option value="0.68">গ্রামীণ এলাকা</option>
+              </select>
+            </div>
+            <div class="fgroup"><label>সিটি কর্পোরেশন / পৌরসভা</label>
+              <select id="city-corp" onchange="recalculate()">
+                <option value="none">প্রযোজ্য নয়</option>
+                <option value="dncc">ঢাকা উত্তর সিটি কর্পোরেশন</option>
+                <option value="dscc">ঢাকা দক্ষিণ সিটি কর্পোরেশন</option>
+                <option value="ccc">চট্টগ্রাম সিটি কর্পোরেশন</option>
+                <option value="rcc">রাজশাহী সিটি কর্পোরেশন</option>
+                <option value="kcc">খুলনা সিটি কর্পোরেশন</option>
+                <option value="bcc">বরিশাল সিটি কর্পোরেশন</option>
+                <option value="scc">সিলেট সিটি কর্পোরেশন</option>
+                <option value="rngcc">রংপুর সিটি কর্পোরেশন</option>
+                <option value="mcc">ময়মনসিংহ সিটি কর্পোরেশন</option>
+                <option value="gcc">গাজীপুর সিটি কর্পোরেশন</option>
+                <option value="ncc">নারায়ণগঞ্জ সিটি কর্পোরেশন</option>
+                <option value="cocc">কুমিল্লা সিটি কর্পোরেশন</option>
+                <option value="pour1">পৌরসভা (১ম শ্রেণী)</option>
+                <option value="pour2">পৌরসভা (২য় শ্রেণী)</option>
+                <option value="pour3">পৌরসভা (৩য় শ্রেণী)</option>
+              </select>
+            </div>
+            <div class="fgroup"><label>ভূমিকম্প জোন (BNBC 2020)</label>
+              <select id="seismic-zone" onchange="recalculate()">
+                <option value="1.0">জোন-১ (কম) — খুলনা, বরিশাল, পটুয়াখালী</option>
+                <option value="1.05" selected>জোন-২ (মাঝারি) — ঢাকা, চট্টগ্রাম, রাজশাহী</option>
+                <option value="1.10">জোন-৩ (বেশি) — রংপুর, দিনাজপুর, ময়মনসিংহ</option>
+                <option value="1.15">জোন-৪ (অতি বেশি) — সিলেট, সুনামগঞ্জ, নেত্রকোনা</option>
+              </select>
+            </div>
           </div>
-          <div class="form-group"><label>বিশেষ পরিবেশ</label>
-            <select id="special-env" onchange="recalculate()">
-              <option value="1.0">সাধারণ</option>
-              <option value="1.07">সমুদ্র উপকূল (+৭%)</option>
-              <option value="1.20">পার্বত্য এলাকা (+২০%)</option>
-              <option value="1.12">হাওর/বিল এলাকা (+১২%)</option>
-              <option value="1.08">বন্যা প্রবণ (+৮%)</option>
-            </select>
+          <div class="grid-3" style="margin-top:14px">
+            <div class="fgroup"><label>বন্যা ঝুঁকি</label>
+              <select id="flood-risk" onchange="recalculate()">
+                <option value="1.0">নেই</option>
+                <option value="1.04">কম (বার্ষিক বন্যামুক্ত)</option>
+                <option value="1.08" selected>মাঝারি (মাঝেমধ্যে)</option>
+                <option value="1.13">বেশি (ঘন ঘন বন্যা)</option>
+                <option value="1.18">অতি বেশি (হাওর/বিল/চর)</option>
+              </select>
+            </div>
+            <div class="fgroup"><label>বিশেষ পরিবেশ</label>
+              <select id="special-env" onchange="recalculate()">
+                <option value="1.0">সাধারণ</option>
+                <option value="1.07">সমুদ্র উপকূল (কক্সবাজার, চট্টগ্রাম, বরগুনা)</option>
+                <option value="1.20">পার্বত্য চট্টগ্রাম (রাঙ্গামাটি, বান্দরবান, খাগড়াছড়ি)</option>
+                <option value="1.12">হাওর এলাকা (সুনামগঞ্জ, কিশোরগঞ্জ, নেত্রকোনা)</option>
+                <option value="1.05">চর এলাকা (নোয়াখালী, ভোলা, পটুয়াখালী)</option>
+                <option value="1.08">মৌসুমী বন্যা প্রবণ</option>
+                <option value="1.03">শিল্প এলাকা</option>
+              </select>
+            </div>
+            <div class="fgroup"><label>গ্যাস সংযোগ দূরত্ব (মিটার)</label>
+              <input type="number" id="gas-dist" value="50" min="0" max="5000" onchange="vp(this);recalculate()">
+              <span class="hint">প্রতি মিটার ৳ ৮০০ অতিরিক্ত খরচ</span>
+            </div>
           </div>
+          <div id="location-note" style="margin-top:14px;display:none" class="alert alert-warning"></div>
         </div>
-        <div class="grid-3" style="margin-top:12px;">
-          <div class="form-group"><label>বন্যা ঝুঁকি</label>
-            <select id="flood-risk" onchange="recalculate()">
-              <option value="1.0">নেই</option>
-              <option value="1.05">কম</option>
-              <option value="1.10" selected>মাঝারি</option>
-              <option value="1.15">বেশি</option>
-              <option value="1.20">অতি বেশি</option>
-            </select>
-          </div>
-          <div class="form-group"><label>গ্যাস সংযোগ দূরত্ব (মিটার)</label>
-            <input type="number" id="gas-dist" value="50" min="0" onchange="recalculate()">
-            <span class="hint">প্রতি মিটার ৳ ৮০০</span>
-          </div>
-          <div class="form-group"><label>সিটি কর্পোরেশন / পৌরসভা</label>
-            <select id="city-corp" onchange="recalculate()">
-              <option value="0">প্রযোজ্য নয়</option>
-              <option value="1">ঢাকা উত্তর/দক্ষিণ সিটি কর্প.</option>
-              <option value="1">চট্টগ্রাম সিটি কর্প.</option>
-              <option value="1">অন্যান্য সিটি কর্পোরেশন (৮টি)</option>
-              <option value="0.5">পৌরসভা (১ম শ্রেণী)</option>
-              <option value="0.3">পৌরসভা (২য়/৩য় শ্রেণী)</option>
-            </select>
-          </div>
-        </div>
-        <div style="margin-top:14px; padding:12px; background:var(--bg); border-radius:var(--radius-sm); font-size:12px;">
-          <strong>সম্মিলিত পরিবেশ ফ্যাক্টর:</strong>
-          <span id="env-combined" style="font-size:16px; font-weight:700; color:var(--primary); margin-left:8px;">১.১৬</span>
-          <span style="margin-left:16px; color:var(--text-muted);">
-            এলাকা <span id="ef1">১.০০</span> × ভূমিকম্প <span id="ef2">১.০৫</span> × বন্যা <span id="ef3">১.১০</span> × পরিবেশ <span id="ef4">১.০০</span>
-          </span>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title"><div class="card-title-icon">🌡️</div> পরিবেশ ফ্যাক্টর সারসংক্ষেপ</div></div>
+        <div class="card-body">
+          <table class="env-table">
+            <tr><td class="ev-label">এলাকা ধরণ ফ্যাক্টর</td><td class="ev-val" id="ef1">১.০০</td><td style="font-size:11px;color:var(--text-faint)">শহর/মেট্রো/গ্রামীণ ভেদে পরিবর্তনশীল</td></tr>
+            <tr><td class="ev-label">ভূমিকম্প ফ্যাক্টর</td><td class="ev-val" id="ef2">১.০৫</td><td style="font-size:11px;color:var(--text-faint)">BNBC 2020 সিসমিক জোন অনুযায়ী</td></tr>
+            <tr><td class="ev-label">বন্যা ঝুঁকি ফ্যাক্টর</td><td class="ev-val" id="ef3">১.০৮</td><td style="font-size:11px;color:var(--text-faint)">ফাউন্ডেশন ও ওয়াটারপ্রুফিং খরচ বৃদ্ধি</td></tr>
+            <tr><td class="ev-label">বিশেষ পরিবেশ ফ্যাক্টর</td><td class="ev-val" id="ef4">১.০০</td><td style="font-size:11px;color:var(--text-faint)">পার্বত্য/উপকূল/হাওর</td></tr>
+            <tr><td class="ev-label">সম্মিলিত পরিবেশ ফ্যাক্টর</td><td class="ev-val" id="ef-total" style="font-size:20px;color:var(--green-700)">১.১৩</td><td style="font-size:11px;color:var(--text-faint)">সকল ফ্যাক্টরের গুণফল</td></tr>
+          </table>
         </div>
       </div>
     </div>
 
-    <!-- ====== BUILDING ====== -->
+    <!-- ===== BUILDING ===== -->
     <div class="section" id="section-building">
+      <div class="section-intro">
+        <div class="section-intro-icon">🏢</div>
+        <div><h3>বিল্ডিং কনফিগারেশন (৪০+ টাইপ)</h3><p>বিল্ডিং ক্যাটাগরি ও টাইপ নির্বাচন করুন। প্রতিটি টাইপের নিজস্ব কস্ট মাল্টিপ্লায়ার রয়েছে — হাসপাতাল ×১.৬৮, গোডাউন ×০.৯২।</p></div>
+      </div>
       <div class="card">
-        <div class="card-title">🏢 বিল্ডিং টাইপ ও কনফিগারেশন <span class="badge">৩০+ ধরণ</span></div>
-        <div class="grid-3">
-          <div class="form-group"><label>বিল্ডিং টাইপ</label>
-            <select id="bldg-type" onchange="onBuildingTypeChange()">
-              <option value="1.0">আবাসিক বাড়ি/ফ্ল্যাট</option>
-              <option value="1.15">অ্যাপার্টমেন্ট (বহুতল)</option>
-              <option value="1.25">বাণিজ্যিক অফিস</option>
-              <option value="1.30">শোরুম</option>
-              <option value="1.35">ব্যাংক</option>
-              <option value="1.68">হাসপাতাল</option>
-              <option value="1.45">ক্লিনিক</option>
-              <option value="1.20">স্কুল</option>
-              <option value="1.30">কলেজ/বিশ্ববিদ্যালয়</option>
-              <option value="1.40">হোটেল (★★★)</option>
-              <option value="1.60">হোটেল (★★★★★)</option>
-              <option value="1.55">রিসোর্ট</option>
-              <option value="1.10">মসজিদ</option>
-              <option value="0.85">ঈদগাহ মাঠ</option>
-              <option value="0.94">গোডাউন/ওয়্যারহাউস</option>
-              <option value="0.90">কোল্ড স্টোরেজ</option>
-              <option value="1.05">শিল্প কারখানা</option>
-              <option value="1.15">গার্মেন্টস</option>
-              <option value="1.35">ফুড প্রসেসিং</option>
-              <option value="1.50">ফার্মাসিউটিক্যালস</option>
-              <option value="1.10">কমিউনিটি সেন্টার</option>
-              <option value="1.20">কনভেনশন হল</option>
-              <option value="0.95">পেট্রোল পাম্প</option>
-              <option value="1.15">ভিলা</option>
-              <option value="1.45">ল্যাবরেটরি</option>
-              <option value="1.30">স্টেডিয়াম</option>
-              <option value="1.25">অডিটোরিয়াম</option>
-              <option value="1.10">মাল্টিলেভেল পার্কিং</option>
-            </select>
+        <div class="card-header"><div class="card-title"><div class="card-title-icon">🏢</div> বিল্ডিং টাইপ নির্বাচন <span class="chip">৪০+ ধরণ</span></div></div>
+        <div class="card-body">
+          <div class="grid-3">
+            <div class="fgroup"><label>বিল্ডিং ক্যাটাগরি</label>
+              <select id="bldg-cat" onchange="filterBuildingTypes()">
+                <option value="all">সব ধরণ দেখুন</option>
+                <option value="residential">🏠 আবাসিক</option>
+                <option value="commercial">🏪 বাণিজ্যিক</option>
+                <option value="health">🏥 স্বাস্থ্য</option>
+                <option value="education">🏫 শিক্ষা</option>
+                <option value="hospitality">🏨 আতিথেয়তা</option>
+                <option value="religious">🕌 ধর্মীয়</option>
+                <option value="industrial">🏭 শিল্প</option>
+                <option value="govt">🏛️ সরকারি</option>
+                <option value="transport">🚌 পরিবহন</option>
+                <option value="recreation">⚽ বিনোদন</option>
+                <option value="agri">🌾 কৃষি</option>
+              </select>
+            </div>
+            <div class="fgroup"><label>বিল্ডিং টাইপ</label><select id="bldg-type" onchange="onBuildingTypeChange()"></select></div>
+            <div class="fgroup"><label>নির্মাণ মান</label>
+              <select id="quality" onchange="recalculate()">
+                <option value="0.70">ইকোনমি (সাধারণ/গ্রামীণ)</option>
+                <option value="1.00" selected>স্ট্যান্ডার্ড (সিটি)</option>
+                <option value="1.35">প্রিমিয়াম</option>
+                <option value="1.85">লাক্সারি / হাই-এন্ড</option>
+              </select>
+            </div>
           </div>
-          <div class="form-group"><label>নির্মাণ মান</label>
-            <select id="quality" onchange="recalculate()">
-              <option value="0.70">ইকোনমি (×০.৭)</option>
-              <option value="1.00" selected>স্ট্যান্ডার্ড (×১.০)</option>
-              <option value="1.35">প্রিমিয়াম (×১.৩৫)</option>
-              <option value="1.85">লাক্সারি (×১.৮৫)</option>
-            </select>
+          <div class="grid-3" style="margin-top:14px">
+            <div class="fgroup"><label>স্ট্রাকচার টাইপ</label>
+              <select id="structure" onchange="recalculate()">
+                <option value="1.0" selected>RCC ফ্রেম (স্ট্যান্ডার্ড)</option>
+                <option value="0.85">লোড বেয়ারিং (১-৩ তলা)</option>
+                <option value="1.22">স্টিল ফ্রেম (হেভি)</option>
+                <option value="1.12">কম্পোজিট (RCC+Steel)</option>
+                <option value="0.75">টিনশেড / সেমিপাকা</option>
+                <option value="1.30">প্রি-ইঞ্জিনিয়ারড (PEB)</option>
+              </select>
+            </div>
+            <div class="fgroup"><label>কংক্রিট গ্রেড</label>
+              <select id="concrete-grade" onchange="recalculate()">
+                <option value="1.0">M15 (সাধারণ — ১-২ তলা)</option>
+                <option value="1.08" selected>M20 (স্ট্যান্ডার্ড — ৩-৫ তলা)</option>
+                <option value="1.15">M25 (প্রিমিয়াম — ৬-১০ তলা)</option>
+                <option value="1.22">M30 (হেভি ডিউটি — ১০+ তলা)</option>
+                <option value="1.30">M35 (ইন্ডাস্ট্রিয়াল হাই লোড)</option>
+              </select>
+            </div>
+            <div class="fgroup"><label>ফাউন্ডেশন টাইপ</label>
+              <select id="foundation" onchange="recalculate()">
+                <option value="0.05">স্ট্রিপ (১-২ তলা, শুকনো মাটি)</option>
+                <option value="0.06">শ্যালো / আইসোলেটেড (২-৩ তলা)</option>
+                <option value="0.10" selected>পাইল (৩-৮ তলা, নরম মাটি)</option>
+                <option value="0.08">র‍্যাফট (ব্যাসমেন্ট সহ)</option>
+                <option value="0.13">ডিপ পাইল ৪০+ ফুট (৮+ তলা)</option>
+                <option value="0.15">পাইলড র‍্যাফট (হাই-রাইজ)</option>
+              </select>
+            </div>
           </div>
-          <div class="form-group"><label>স্ট্রাকচার</label>
-            <select id="structure" onchange="recalculate()">
-              <option value="1.0" selected>RCC ফ্রেম</option>
-              <option value="0.85">লোড বেয়ারিং</option>
-              <option value="1.20">স্টিল ফ্রেম</option>
-            </select>
+          <div class="grid-4" style="margin-top:14px">
+            <div class="fgroup"><label>মোট আয়তন (sqft)</label>
+              <input type="number" id="total-area" value="2000" min="100" max="500000" onchange="vp(this);recalculate()">
+              <span class="hint">মোট বিল্ট-আপ এরিয়া</span>
+            </div>
+            <div class="fgroup"><label>তলা সংখ্যা</label>
+              <input type="number" id="floors" value="3" min="1" max="60" onchange="vp(this);recalculate()">
+            </div>
+            <div class="fgroup"><label>লিফট সংখ্যা</label>
+              <input type="number" id="lifts" value="0" min="0" max="20" onchange="vp(this);recalculate()">
+              <span class="hint">প্রতিটি ৳ ২৫ লক্ষ</span>
+            </div>
+            <div class="fgroup"><label>বেস রেট (৳/sqft)</label>
+              <input type="number" id="base-rate" value="2200" min="500" max="15000" onchange="vp(this);recalculate()">
+              <span class="hint">ঢাকা স্ট্যান্ডার্ড: ২২০০-২৮০০</span>
+            </div>
           </div>
         </div>
-        <div class="grid-4" style="margin-top:12px;">
-          <div class="form-group"><label>মোট আয়তন (sqft)</label>
-            <input type="number" id="total-area" value="2000" min="100" onchange="recalculate(); renderFloorFinish();">
-          </div>
-          <div class="form-group"><label>তলা সংখ্যা</label>
-            <input type="number" id="floors" value="3" min="1" max="50" onchange="recalculate(); renderFloorFinish();">
-          </div>
-          <div class="form-group"><label>ফাউন্ডেশন টাইপ</label>
-            <select id="foundation" onchange="recalculate()">
-              <option value="0.08">শ্যালো</option>
-              <option value="0.12" selected>পাইল</option>
-              <option value="0.10">র্যাফট</option>
-            </select>
-          </div>
-          <div class="form-group"><label>লিফট সংখ্যা</label>
-            <input type="number" id="lifts" value="0" min="0" onchange="recalculate()">
-            <span class="hint">প্রতি লিফট ৳ ২৫ লক্ষ</span>
-          </div>
-        </div>
-        <div class="grid-3" style="margin-top:12px;">
-          <div class="form-group"><label>কংক্রিট গ্রেড</label>
-            <select id="concrete-grade" onchange="recalculate()">
-              <option value="1.0">M15</option>
-              <option value="1.08" selected>M20 (স্ট্যান্ডার্ড)</option>
-              <option value="1.15">M25</option>
-              <option value="1.22">M30</option>
-            </select>
-          </div>
-          <div class="form-group"><label>বেস রেট (৳/sqft)</label>
-            <input type="number" id="base-rate" value="2200" onchange="recalculate()">
-            <span class="hint">ঢাকা স্ট্যান্ডার্ড: ৳ ২২০০–২৮০০</span>
-          </div>
-          <div class="form-group"><label>মোট কনফিগ ফ্যাক্টর</label>
-            <input type="text" id="config-factor" readonly style="font-weight:700; color:var(--primary); background:var(--bg);">
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title"><div class="card-title-icon">📐</div> গণনা ফ্যাক্টর ওভারভিউ</div></div>
+        <div class="card-body">
+          <div class="grid-4">
+            <div style="text-align:center;padding:12px;background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--border)">
+              <div style="font-size:10px;color:var(--text-muted);font-weight:600;margin-bottom:4px">বিল্ডিং ফ্যাক্টর</div>
+              <div id="bldg-factor-d" style="font-size:22px;font-weight:800;color:var(--green-700)">১.০০</div>
+            </div>
+            <div style="text-align:center;padding:12px;background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--border)">
+              <div style="font-size:10px;color:var(--text-muted);font-weight:600;margin-bottom:4px">মান × স্ট্রাকচার</div>
+              <div id="qs-factor-d" style="font-size:22px;font-weight:800;color:var(--amber-600)">১.০০</div>
+            </div>
+            <div style="text-align:center;padding:12px;background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--border)">
+              <div style="font-size:10px;color:var(--text-muted);font-weight:600;margin-bottom:4px">সম্মিলিত ফ্যাক্টর</div>
+              <div id="config-factor-d" style="font-size:22px;font-weight:800;color:var(--sky-600)">১.০০</div>
+            </div>
+            <div style="text-align:center;padding:12px;background:linear-gradient(135deg,var(--green-50),#fff);border-radius:var(--radius-sm);border:1px solid var(--green-200)">
+              <div style="font-size:10px;color:var(--text-muted);font-weight:600;margin-bottom:4px">মূল নির্মাণ খরচ</div>
+              <div id="base-cost-d" style="font-size:16px;font-weight:800;color:var(--green-800)">৳ ০</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ====== MATERIALS ====== -->
+    <!-- ===== MATERIALS ===== -->
     <div class="section" id="section-materials">
-      <div class="card">
-        <div class="card-title">🧱 ম্যাটেরিয়াল টেকঅফ <span class="badge">স্বয়ংক্রিয় হিসাব</span></div>
-        <div class="grid-3" style="margin-bottom:14px;">
-          <div class="form-group"><label>রডের ডায়া (মিমি)</label>
-            <select id="rod-dia" onchange="recalculate()">
-              <option value="0.87">৮ মিমি</option>
-              <option value="0.92">১০ মিমি</option>
-              <option value="1.0" selected>১২ মিমি (সাধারণ)</option>
-              <option value="1.12">১৬ মিমি</option>
-              <option value="1.25">২০ মিমি</option>
-              <option value="1.40">২৫ মিমি</option>
-            </select>
-          </div>
-          <div class="form-group"><label>ইটের ব্র্যান্ড</label>
-            <select id="brick-brand" onchange="recalculate()">
-              <option value="12">সাধারণ মাটির ইট (৳ ১২)</option>
-              <option value="14" selected>১ম শ্রেণী (৳ ১৪)</option>
-              <option value="18">হলো ব্লক (৳ ১৮)</option>
-              <option value="22">অটো ব্রিক (৳ ২২)</option>
-            </select>
-          </div>
-          <div class="form-group"><label>সিমেন্ট ব্র্যান্ড</label>
-            <select id="cement-brand" onchange="recalculate()">
-              <option value="480">সাধারণ OPC (৳ ৪৮০)</option>
-              <option value="520" selected>Shah Cement (৳ ৫২০)</option>
-              <option value="550">Holcim (৳ ৫৫০)</option>
-              <option value="580">LaFarge (৳ ৫৮০)</option>
-            </select>
-          </div>
-        </div>
-        <table class="mat-table" id="materials-table">
-          <thead>
-            <tr>
-              <th>#</th><th>উপকরণ</th><th>পরিমাণ</th><th>একক</th><th>একক মূল্য (৳)</th><th class="amt">মোট (৳)</th>
-            </tr>
-          </thead>
-          <tbody id="mat-tbody"></tbody>
-        </table>
+      <div class="section-intro">
+        <div class="section-intro-icon">🧱</div>
+        <div><h3>ম্যাটেরিয়াল টেকঅফ</h3><p>প্রমাণ সূত্র (BNBC + রাজউক CWR) ব্যবহার করে স্বয়ংক্রিয়ভাবে গণনা করা উপকরণের পরিমাণ ও বর্তমান বাজারমূল্য।</p></div>
       </div>
       <div class="card">
-        <div class="card-title">📊 উপকরণ খরচ বিতরণ</div>
-        <div class="chart-wrap" style="height:260px;"><canvas id="matChart" role="img" aria-label="উপকরণ বার চার্ট"></canvas></div>
+        <div class="card-header"><div class="card-title"><div class="card-title-icon">🧱</div> ম্যাটেরিয়াল টেকঅফ তালিকা <span class="chip">বিস্তারিত হিসাব</span></div></div>
+        <div class="card-body" style="padding-left:0;padding-right:0">
+          <table class="mat-table"><thead><tr><th style="padding-left:22px">উপকরণ</th><th>পরিমাণ</th><th>একক</th><th>একক মূল্য (৳)</th><th style="text-align:right;padding-right:22px">মোট খরচ (৳)</th></tr></thead><tbody id="mat-tbody"></tbody></table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title"><div class="card-title-icon">📊</div> উপকরণ খরচ চার্ট</div></div>
+        <div class="card-body"><div class="chart-wrap" style="height:280px"><canvas id="matChart"></canvas></div></div>
       </div>
     </div>
 
-    <!-- ====== LABOR ====== -->
+    <!-- ===== LABOR ===== -->
     <div class="section" id="section-labor">
-      <div class="card">
-        <div class="card-title">👷 শ্রমিক তালিকা <span class="badge">৩০+ ক্যাটাগরি</span></div>
-        <div style="display:grid; grid-template-columns:2fr 80px 100px 80px 110px 40px; gap:8px; padding:6px 0; border-bottom:2px solid var(--border); font-size:11px; font-weight:700; color:var(--text-muted);">
-          <span>পদবী</span><span>সংখ্যা</span><span>দৈনিক মজুরি (৳)</span><span>কর্মদিন</span><span>মোট (৳)</span><span></span>
-        </div>
-        <div id="labor-list"></div>
-        <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="btn btn-outline btn-sm" onclick="addLaborRow()">+ শ্রমিক যোগ</button>
-          <button class="btn btn-sm" style="background:var(--bg); border:1px solid var(--border);" onclick="resetLabor()">↩ রিসেট</button>
+      <div class="section-intro">
+        <div class="section-intro-icon">👷</div>
+        <div>
+          <h3>শ্রমিক, সময়রেখা ও যন্ত্রপাতি</h3>
+          <p><strong>রিয়েল-টাইম লজিক:</strong> শ্রমিক বাড়ালে নির্মাণ সময় কমবে, শ্রমিক কমালে সময় বাড়বে। কাজের দিন ও মজুরি পরিবর্তনে তাৎক্ষণিক হিসাব আপডেট হবে।</p>
         </div>
       </div>
-      <div class="card">
-        <div class="card-title">🔧 যন্ত্রপাতি ভাড়া</div>
-        <div class="grid-4">
-          <div class="form-group"><label>ক্রেন (ঘন্টা)</label>
-            <input type="number" id="crane-hrs" value="0" min="0" onchange="recalculate()">
-            <span class="hint">৳ ৩,৫০০/ঘন্টা</span></div>
-          <div class="form-group"><label>মিক্সার (দিন)</label>
-            <input type="number" id="mixer-days" value="30" min="0" onchange="recalculate()">
-            <span class="hint">৳ ১,৮০০/দিন</span></div>
-          <div class="form-group"><label>পাম্প (দিন)</label>
-            <input type="number" id="pump-days" value="0" min="0" onchange="recalculate()">
-            <span class="hint">৳ ৮,০০০/দিন</span></div>
-          <div class="form-group"><label>ভাইব্রেটর (দিন)</label>
-            <input type="number" id="vib-days" value="20" min="0" onchange="recalculate()">
-            <span class="hint">৳ ৫০০/দিন</span></div>
+
+      <!-- Labor Impact Cards -->
+      <div class="labor-impact" id="labor-impact-cards">
+        <div class="impact-card ic-green">
+          <div class="impact-label">মোট শ্রমিক ম্যান-ডে</div>
+          <div class="impact-value" id="total-manday">০</div>
+          <div class="impact-change ic-up" id="md-change">—</div>
         </div>
-        <div style="margin-top:10px; padding:10px; background:var(--bg); border-radius:6px; font-size:13px;">
-          মোট যন্ত্রপাতি খরচ: <strong id="equip-total">৳ ০</strong> &nbsp;|&nbsp; মোট ম্যান-ডে: <strong id="total-manday">০</strong> &nbsp;|&nbsp; আনু. সময়: <strong id="est-months" style="color:var(--accent);">০ মাস</strong>
+        <div class="impact-card ic-amber">
+          <div class="impact-label">আনুমানিক নির্মাণকাল</div>
+          <div class="impact-value" id="est-months">০ মাস</div>
+          <div class="impact-change" id="time-change" style="font-size:10px;color:var(--text-muted)">শ্রমিক পরিবর্তনে আপডেট হয়</div>
+        </div>
+        <div class="impact-card ic-sky">
+          <div class="impact-label">মোট শ্রমিক ব্যয়</div>
+          <div class="impact-value" id="labor-total-d">৳ ০</div>
+          <div class="impact-change ic-up" id="lc-change">—</div>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div class="card">
+        <div class="card-header"><div class="card-title"><div class="card-title-icon">📅</div> নির্মাণ সময়রেখা (Construction Timeline)</div></div>
+        <div class="card-body">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="font-size:13px;color:var(--text-secondary)">মোট নির্মাণকাল: <strong id="timeline-months" style="color:var(--green-700);font-size:16px">০ মাস</strong></div>
+            <div style="font-size:12px;color:var(--text-muted)">গড় দৈনিক শ্রমিক: <strong id="avg-workers">০</strong> জন</div>
+          </div>
+          <div class="timeline-wrap">
+            <div class="timeline-track"><div class="timeline-fill" id="timeline-fill" style="width:5%"></div></div>
+          </div>
+          <div class="timeline-milestones">
+            <div class="milestone"><div class="milestone-name">🏗️ ভিত্তি</div><div class="milestone-time" id="m1">— মাস</div><div class="milestone-pct">২০%</div></div>
+            <div class="milestone"><div class="milestone-name">🏛️ কলাম/স্ল্যাব</div><div class="milestone-time" id="m2">— মাস</div><div class="milestone-pct">৪০%</div></div>
+            <div class="milestone"><div class="milestone-name">🔌 MEP কাজ</div><div class="milestone-time" id="m3">— মাস</div><div class="milestone-pct">৭০%</div></div>
+            <div class="milestone"><div class="milestone-name">🎨 ফিনিশিং</div><div class="milestone-time" id="m4">— মাস</div><div class="milestone-pct">১০০%</div></div>
+          </div>
+          <div class="alert alert-info" style="margin-top:14px;margin-bottom:0">
+            💡 <span id="timeline-tip">শ্রমিক সংখ্যা বাড়ালে নির্মাণ সময় কমে। কাজের দিন বাড়ালেও সময় কমে। একাধিক টিম একসাথে কাজ করলে সময় সবচেয়ে কম হয়।</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Labor Table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><div class="card-title-icon">👷</div> শ্রমিক তালিকা <span class="chip">PWD SOR 2023 হার</span></div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-sm" onclick="resetLabor()">↺ ডিফল্ট</button>
+            <button class="btn btn-primary btn-sm" onclick="addLaborRow()">+ শ্রমিক যোগ</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0">
+          <table class="labor-table">
+            <thead><tr>
+              <th style="padding-left:22px">পদবী ও ধরণ</th>
+              <th style="width:80px">সংখ্যা</th>
+              <th style="width:110px">মজুরি/দিন (৳)</th>
+              <th style="width:80px">কাজের দিন</th>
+              <th style="width:90px">কার্যদিবস/sqft</th>
+              <th style="width:110px;text-align:right">মোট খরচ (৳)</th>
+              <th style="width:40px;padding-right:12px"></th>
+            </tr></thead>
+            <tbody id="labor-tbody"></tbody>
+          </table>
+          <div style="padding:12px 22px;background:linear-gradient(135deg,var(--green-50),#fff);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;color:var(--text-secondary)">মোট শ্রমিক খরচ:</span>
+            <strong id="labor-grand" style="font-size:18px;color:var(--green-700)">৳ ০</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Equipment -->
+      <div class="card">
+        <div class="card-header"><div class="card-title"><div class="card-title-icon">🔧</div> যন্ত্রপাতি ভাড়া</div></div>
+        <div class="card-body">
+          <div class="grid-3">
+            <div class="fgroup"><label>ক্রেন (ঘন্টা)</label><input type="number" id="crane-hrs" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳ ৩,৫০০/ঘন্টা</span></div>
+            <div class="fgroup"><label>কংক্রিট মিক্সার (দিন)</label><input type="number" id="mixer-days" value="30" min="0" onchange="vp(this);recalculate()"><span class="hint">৳ ১,৮০০/দিন</span></div>
+            <div class="fgroup"><label>কংক্রিট পাম্প (দিন)</label><input type="number" id="pump-days" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳ ৮,০০০/দিন</span></div>
+            <div class="fgroup"><label>ভাইব্রেটর (দিন)</label><input type="number" id="vib-days" value="20" min="0" onchange="vp(this);recalculate()"><span class="hint">৳ ৫০০/দিন</span></div>
+            <div class="fgroup"><label>স্ক্যাফোল্ডিং (দিন)</label><input type="number" id="scaffold-days" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳ ২,০০০/দিন</span></div>
+            <div class="fgroup"><label>ডিওয়াটারিং পাম্প (দিন)</label><input type="number" id="dewater-days" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳ ১,৫০০/দিন</span></div>
+          </div>
+          <div style="margin-top:12px;background:var(--green-50);border:1px solid var(--green-200);border-radius:var(--radius-sm);padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;color:var(--text-secondary)">মোট যন্ত্রপাতি ভাড়া:</span>
+            <strong id="equip-total" style="font-size:16px;color:var(--green-700)">৳ ০</strong>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- ====== EXTRAS ====== -->
+    <!-- ===== EXTRAS ===== -->
     <div class="section" id="section-extras">
-      <div class="card">
-        <div class="card-title">⚡ অতিরিক্ত সুবিধা ও ডিজাইন</div>
-        <div class="grid-3">
-          <div class="form-group"><label>সোলার প্যানেল (kW)</label>
-            <input type="number" id="solar-kw" value="0" min="0" onchange="recalculate(); calcSolarROI()">
-            <span class="hint">৳ ৮০,০০০/kW</span></div>
-          <div class="form-group"><label>জেনারেটর (kVA)</label>
-            <input type="number" id="gen-kva" value="0" min="0" onchange="recalculate()">
-            <span class="hint">৳ ১৫,০০০/kVA</span></div>
-          <div class="form-group"><label>বাউন্ডারি ওয়াল (ফুট)</label>
-            <input type="number" id="boundary" value="0" min="0" onchange="recalculate()">
-            <span class="hint">৳ ৬০০/ফুট</span></div>
-          <div class="form-group"><label>ইন্টেরিয়র লেভেল</label>
-            <select id="interior" onchange="recalculate()">
-              <option value="0">নেই</option>
-              <option value="150">বেসিক (৳ ১৫০/sqft)</option>
-              <option value="350" selected>মিডিয়াম (৳ ৩৫০/sqft)</option>
-              <option value="700">প্রিমিয়াম (৳ ৭০০/sqft)</option>
-              <option value="1500">লাক্সারি (৳ ১৫০০/sqft)</option>
-            </select>
-          </div>
-          <div class="form-group"><label>ওভারহেড ট্যাংক (লিটার)</label>
-            <input type="number" id="tank" value="2000" min="0" onchange="recalculate()">
-            <span class="hint">৳ ১২,০০০/হাজার লিটার</span></div>
-          <div class="form-group"><label>ল্যান্ডস্কেপিং (sqft)</label>
-            <input type="number" id="landscape" value="0" min="0" onchange="recalculate()">
-            <span class="hint">৳ ১২০/sqft</span></div>
-        </div>
-        <div class="grid-4" style="margin-top:12px;">
-          <div class="form-group"><label>বেডরুম</label>
-            <input type="number" id="bedrooms" value="3" min="0" onchange="recalculate()">
-            <span class="hint">৳ ৮০,০০০/টি</span></div>
-          <div class="form-group"><label>দরজা</label>
-            <input type="number" id="doors" value="8" min="0" onchange="recalculate()">
-            <span class="hint">৳ ১২,০০০/টি</span></div>
-          <div class="form-group"><label>জানালা</label>
-            <input type="number" id="windows" value="12" min="0" onchange="recalculate()">
-            <span class="hint">৳ ৮,০০০/টি</span></div>
-          <div class="form-group"><label>বাথরুম</label>
-            <input type="number" id="bathrooms" value="3" min="0" onchange="recalculate()">
-            <span class="hint">৳ ৬০,০০০/টি</span></div>
-        </div>
+      <div class="section-intro">
+        <div class="section-intro-icon">⚡</div>
+        <div><h3>অতিরিক্ত সুবিধা ও ডিজাইন (৫০+ আইটেম)</h3><p>সোলার, জেনারেটর, ইন্টেরিয়র, স্মার্ট হোম, সিকিউরিটি, গ্রীন বিল্ডিং — সব ধরনের অতিরিক্ত সুবিধা এক জায়গায়।</p></div>
       </div>
-      <div class="card">
-        <div class="card-title">☀️ সোলার ROI ক্যালকুলেটর</div>
-        <div class="grid-3">
-          <div class="form-group"><label>মাসিক বিদ্যুৎ বিল (৳)</label>
-            <input type="number" id="monthly-bill" value="5000" onchange="calcSolarROI()"></div>
-          <div class="form-group">
-            <label>সোলার কভারেজ: <span id="spct-out">৭০%</span></label>
-            <input type="range" id="solar-pct" min="10" max="100" value="70" oninput="document.getElementById('spct-out').textContent=this.value+'%'; calcSolarROI()">
-          </div>
-          <div id="solar-roi-result" style="background:var(--bg); padding:12px; border-radius:8px; font-size:13px; border:1px solid var(--border);">
-            সোলার kW দিন →
+      <div class="sub-tabs">
+        <button class="sub-tab active" onclick="showExtrasTab('basic',this)">⚡ বেসিক</button>
+        <button class="sub-tab" onclick="showExtrasTab('smart',this)">🤖 স্মার্ট</button>
+        <button class="sub-tab" onclick="showExtrasTab('green',this)">🌿 গ্রীন</button>
+        <button class="sub-tab" onclick="showExtrasTab('security',this)">🔒 নিরাপত্তা</button>
+        <button class="sub-tab" onclick="showExtrasTab('utilities',this)">🔧 ইউটিলিটি</button>
+        <button class="sub-tab" onclick="showExtrasTab('outdoor',this)">🌳 আউটডোর</button>
+      </div>
+      <div id="extras-basic" class="extras-tab">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><div class="card-title-icon">⚡</div> বেসিক সুবিধাসমূহ</div></div>
+          <div class="card-body">
+            <div class="grid-4">
+              <div class="fgroup"><label>ইন্টেরিয়র লেভেল</label>
+                <select id="interior" onchange="recalculate()">
+                  <option value="0">নেই</option>
+                  <option value="150">বেসিক (৳১৫০/sqft)</option>
+                  <option value="350" selected>মিডিয়াম (৳৩৫০/sqft)</option>
+                  <option value="700">প্রিমিয়াম (৳৭০০/sqft)</option>
+                  <option value="1500">লাক্সারি (৳১৫০০/sqft)</option>
+                </select>
+              </div>
+              <div class="fgroup"><label>ওভারহেড ট্যাংক (লিটার)</label><input type="number" id="tank" value="2000" min="0" onchange="vp(this);recalculate()"><span class="hint">৳১২,০০০/১০০০ লিটার</span></div>
+              <div class="fgroup"><label>বেডরুম সংখ্যা</label><input type="number" id="bedrooms" value="3" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৮০,০০০/রুম</span></div>
+              <div class="fgroup"><label>বাথরুম সংখ্যা</label><input type="number" id="bathrooms" value="3" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৬০,০০০/টি</span></div>
+              <div class="fgroup"><label>দরজার সংখ্যা</label><input type="number" id="doors" value="8" min="0" onchange="vp(this);recalculate()"><span class="hint">৳১২,০০০/টি</span></div>
+              <div class="fgroup"><label>জানালার সংখ্যা</label><input type="number" id="windows" value="12" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৮,০০০/টি</span></div>
+              <div class="fgroup"><label>মডুলার কিচেন</label>
+                <select id="kitchen" onchange="recalculate()">
+                  <option value="0">নেই</option>
+                  <option value="150000">বেসিক (৳১.৫ লক্ষ)</option>
+                  <option value="350000">স্ট্যান্ডার্ড (৳৩.৫ লক্ষ)</option>
+                  <option value="700000">প্রিমিয়াম (৳৭ লক্ষ)</option>
+                </select>
+              </div>
+              <div class="fgroup"><label>এয়ার কন্ডিশনিং (টন)</label><input type="number" id="ac-tons" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৭০,০০০/টন (স্প্লিট)</span></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- ====== FLOOR FINISHING (NEW) ====== -->
-    <div class="section" id="section-floorfinish">
-      <div class="alert alert-info">🏠 প্রতিটি তলার জন্য আলাদা ফিনিশিং মান ও উপকরণ নির্ধারণ করুন। যেমন: নিচতলায় মার্বেল, উপরে টাইলস।</div>
-      <div class="card">
-        <div class="card-title">🏠 তলা অনুযায়ী কাস্টম ফিনিশিং <span class="badge">নতুন ফিচার</span></div>
-        <div style="display:grid; grid-template-columns:80px 1fr 1fr 1fr 120px; gap:10px; padding:8px 0; border-bottom:2px solid var(--border); font-size:11px; font-weight:700; color:var(--text-muted);">
-          <span>তলা</span><span>মেঝে</span><span>দেয়াল</span><span>সিলিং</span><span>অতিরিক্ত (৳)</span>
+      <div id="extras-smart" class="extras-tab" style="display:none">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><div class="card-title-icon">🤖</div> স্মার্ট হোম / বিল্ডিং অটোমেশন</div></div>
+          <div class="card-body">
+            <div class="grid-4">
+              <div class="fgroup"><label>স্মার্ট হোম সিস্টেম</label>
+                <select id="smart-home" onchange="recalculate()">
+                  <option value="0">নেই</option>
+                  <option value="100000">বেসিক (লাইট + ফ্যান)</option>
+                  <option value="300000">স্ট্যান্ডার্ড (সব ডিভাইস)</option>
+                  <option value="700000">প্রিমিয়াম (ভয়েস + অ্যাপ)</option>
+                </select>
+              </div>
+              <div class="fgroup"><label>ভিডিও ডোরবেল</label><input type="number" id="video-doorbell" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳১৫,০০০/টি</span></div>
+              <div class="fgroup"><label>স্মার্ট লক সিস্টেম</label><input type="number" id="smart-lock" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳২০,০০০/দরজা</span></div>
+              <div class="fgroup"><label>অটো লাইটিং সেন্সর</label><input type="number" id="auto-light" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৫,০০০/রুম</span></div>
+              <div class="fgroup"><label>হোম থিয়েটার সেটআপ</label>
+                <select id="home-theater" onchange="recalculate()">
+                  <option value="0">নেই</option>
+                  <option value="200000">বেসিক (৳২ লক্ষ)</option>
+                  <option value="500000">প্রিমিয়াম (৳৫ লক্ষ)</option>
+                  <option value="1200000">হাই-এন্ড (৳১২ লক্ষ)</option>
+                </select>
+              </div>
+              <div class="fgroup"><label>ইন্টারকম সিস্টেম</label><input type="number" id="intercom" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳২৫,০০০/সেট</span></div>
+              <div class="fgroup"><label>বিল্ডিং ম্যানেজমেন্ট সিস্টেম</label>
+                <select id="bms" onchange="recalculate()">
+                  <option value="0">নেই</option>
+                  <option value="300000">বেসিক BMS</option>
+                  <option value="800000">ফুল BMS</option>
+                  <option value="2000000">এন্টারপ্রাইজ BMS</option>
+                </select>
+              </div>
+              <div class="fgroup"><label>স্মার্ট মিটারিং</label>
+                <select id="smart-meter" onchange="recalculate()">
+                  <option value="0">নেই</option>
+                  <option value="50000">বেসিক</option>
+                  <option value="150000">প্রিমিয়াম (IoT)</option>
+                </select>
+              </div>
+            </div>
+          </div>
         </div>
-        <div id="floor-finish-list"></div>
-        <div style="margin-top:12px; padding:10px; background:var(--bg); border-radius:6px; font-size:13px;">
-          ফিনিশিং মোট অতিরিক্ত: <strong id="finish-extra-total" style="color:var(--primary);">৳ ০</strong>
+      </div>
+      <div id="extras-green" class="extras-tab" style="display:none">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><div class="card-title-icon">🌿</div> গ্রীন বিল্ডিং ও নবায়নযোগ্য শক্তি</div></div>
+          <div class="card-body">
+            <div class="grid-4">
+              <div class="fgroup"><label>সোলার প্যানেল (kW)</label><input type="number" id="solar-kw" value="0" min="0" onchange="vp(this);recalculate();calcSolarROI()"><span class="hint">৳৮০,০০০/kW</span></div>
+              <div class="fgroup"><label>ব্যাটারি স্টোরেজ (kWh)</label><input type="number" id="battery-kwh" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৬০,০০০/kWh</span></div>
+              <div class="fgroup"><label>সোলার ওয়াটার হিটার (L)</label><input type="number" id="solar-heater" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳১৫,০০০/১০০L</span></div>
+              <div class="fgroup"><label>রেইনওয়াটার হার্ভেস্টিং (L)</label><input type="number" id="rainwater" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৮০,০০০/১০,০০০L</span></div>
+              <div class="fgroup"><label>ডাবল গ্লেজড উইন্ডো (sqft)</label><input type="number" id="double-glaze" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৮০০/sqft অতিরিক্ত</span></div>
+              <div class="fgroup"><label>ছাদ সবুজায়ন (sqft)</label><input type="number" id="green-roof" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৪০০/sqft</span></div>
+              <div class="fgroup"><label>গ্রে-ওয়াটার রিসাইক্লিং</label>
+                <select id="greywater" onchange="recalculate()">
+                  <option value="0">নেই</option>
+                  <option value="150000">বেসিক সিস্টেম</option>
+                  <option value="350000">ফুল সিস্টেম</option>
+                </select>
+              </div>
+              <div class="fgroup"><label>ইন্সুলেটেড ওয়াল প্যানেল (sqft)</label><input type="number" id="insulation" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৩৫০/sqft অতিরিক্ত</span></div>
+            </div>
+            <div style="margin-top:16px;padding:14px;background:var(--amber-100);border-radius:var(--radius-sm);border:1px solid #fde68a">
+              <div style="font-size:12px;font-weight:700;color:#92400e;margin-bottom:6px">☀️ সোলার ROI ক্যালকুলেটর</div>
+              <div class="grid-3">
+                <div class="fgroup"><label>মাসিক বিদ্যুৎ বিল (৳)</label><input type="number" id="monthly-bill" value="5000" min="0" onchange="vp(this);calcSolarROI()"></div>
+                <div class="fgroup"><label>সোলার কভারেজ: <span id="spct-out">৭০%</span></label><input type="range" id="solar-pct" min="10" max="100" value="70" step="5" oninput="document.getElementById('spct-out').textContent=this.value+'%';calcSolarROI()"></div>
+                <div id="solar-roi-box" style="background:#fff;padding:10px;border-radius:var(--radius-xs);font-size:12px;color:var(--text-secondary)">kW পরিমাণ দিন →</div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+      <div id="extras-security" class="extras-tab" style="display:none">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><div class="card-title-icon">🔒</div> নিরাপত্তা ব্যবস্থা</div></div>
+          <div class="card-body">
+            <div class="grid-4">
+              <div class="fgroup"><label>সিসি ক্যামেরা (চ্যানেল)</label><input type="number" id="cctv-ch" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৫,০০০/চ্যানেল + NVR</span></div>
+              <div class="fgroup"><label>অ্যাক্সেস কন্ট্রোল (দরজা)</label><input type="number" id="access-ctrl" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৩০,০০০/দরজা</span></div>
+              <div class="fgroup"><label>ফায়ার অ্যালার্ম (পয়েন্ট)</label><input type="number" id="fire-alarm" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৩,০০০/পয়েন্ট</span></div>
+              <div class="fgroup"><label>ফায়ার স্প্রিংকলার (মাথা)</label><input type="number" id="sprinkler" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৮,০০০/মাথা</span></div>
+              <div class="fgroup"><label>ফায়ার এক্সটিংগুইশার</label><input type="number" id="extinguisher" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৫,০০০/টি</span></div>
+              <div class="fgroup"><label>ইন্ট্রুডার অ্যালার্ম (জোন)</label><input type="number" id="intruder" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳১৫,০০০/জোন</span></div>
+              <div class="fgroup"><label>পেরিমিটার ফেন্সিং (ফুট)</label><input type="number" id="fencing" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৪৫০/ফুট (কেবল ফেন্স)</span></div>
+              <div class="fgroup"><label>সিকিউরিটি গার্ড রুম</label><input type="number" id="guard-room" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৮০,০০০/টি</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="extras-utilities" class="extras-tab" style="display:none">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><div class="card-title-icon">🔧</div> ইউটিলিটি ও পরিষেবা</div></div>
+          <div class="card-body">
+            <div class="grid-4">
+              <div class="fgroup"><label>জেনারেটর (kVA)</label><input type="number" id="gen-kva" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳১৫,০০০/kVA</span></div>
+              <div class="fgroup"><label>UPS সিস্টেম (kVA)</label><input type="number" id="ups-kva" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳২০,০০০/kVA</span></div>
+              <div class="fgroup"><label>সাবমার্সিবল পাম্প (HP)</label><input type="number" id="pump-hp" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳২৫,০০০/HP</span></div>
+              <div class="fgroup"><label>ওয়াটার সফটেনার (GPH)</label><input type="number" id="softener" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৮০,০০০/সেট</span></div>
+              <div class="fgroup"><label>ইন্টারনেট ক্যাবলিং (পয়েন্ট)</label><input type="number" id="lan-pts" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৩,৫০০/পয়েন্ট</span></div>
+              <div class="fgroup"><label>সেন্ট্রাল ভ্যাকুয়াম (পয়েন্ট)</label><input type="number" id="vacuum-pts" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳১৫,০০০/পয়েন্ট</span></div>
+              <div class="fgroup"><label>ডাম্বওয়েটার / ফুড লিফট</label><input type="number" id="dumbwaiter" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳২,০০,০০০/টি</span></div>
+              <div class="fgroup"><label>সেন্ট্রাল AC (টন)</label><input type="number" id="central-ac" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳১,৫০,০০০/টন (VRF)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="extras-outdoor" class="extras-tab" style="display:none">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><div class="card-title-icon">🌳</div> আউটডোর ও পরিবেশ</div></div>
+          <div class="card-body">
+            <div class="grid-4">
+              <div class="fgroup"><label>বাউন্ডারি ওয়াল (ফুট)</label><input type="number" id="boundary" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৬০০/ফুট</span></div>
+              <div class="fgroup"><label>ল্যান্ডস্কেপিং (sqft)</label><input type="number" id="landscape" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳১২০/sqft</span></div>
+              <div class="fgroup"><label>সুইমিং পুল (sqft)</label><input type="number" id="pool-sqft" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৫,০০০/sqft</span></div>
+              <div class="fgroup"><label>আউটডোর পার্কিং (গাড়ি)</label><input type="number" id="outdoor-parking" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৮০,০০০/স্থান</span></div>
+              <div class="fgroup"><label>ড্রাইভওয়ে (sqft পেভিং)</label><input type="number" id="driveway" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳২৫০/sqft</span></div>
+              <div class="fgroup"><label>ছাদ বাগান (sqft)</label><input type="number" id="roof-garden" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৩৫০/sqft</span></div>
+              <div class="fgroup"><label>ফোয়ারা / ওয়াটার ফিচার</label><input type="number" id="fountain" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳১,৫০,০০০/টি</span></div>
+              <div class="fgroup"><label>পারগোলা / শেড (sqft)</label><input type="number" id="pergola" value="0" min="0" onchange="vp(this);recalculate()"><span class="hint">৳৬০০/sqft</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="background:linear-gradient(135deg,var(--green-50),#fff);border:1px solid var(--green-200);border-radius:var(--radius-md);padding:14px 18px;margin-top:4px;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:14px;color:var(--text-secondary);font-weight:600">মোট অতিরিক্ত সুবিধা খরচ:</div>
+        <div id="extras-total-d" style="font-size:22px;font-weight:800;color:var(--green-700)">৳ ০</div>
       </div>
     </div>
 
-    <!-- ====== SPECIAL ====== -->
-    <div class="section" id="section-special">
-      <div class="alert alert-warning">⭐ বিল্ডিং টাইপ অনুযায়ী স্বয়ংক্রিয়ভাবে ফিচার লোড হয়।</div>
-      <div class="card">
-        <div class="card-title" id="special-title">⭐ স্পেশাল ফিচারস (আবাসিক)</div>
-        <div class="feature-grid" id="special-features"></div>
-        <div style="margin-top:12px; padding:10px; background:var(--bg); border-radius:6px;">
-          স্পেশাল মোট: <strong id="special-total" style="color:var(--primary);">৳ ০</strong>
-        </div>
-      </div>
-    </div>
-
-    <!-- ====== FINANCIAL ====== -->
+    <!-- ===== FINANCIAL ===== -->
     <div class="section" id="section-financial">
-      <div class="grid-2">
+      <div class="section-intro">
+        <div class="section-intro-icon">💰</div>
+        <div><h3>আর্থিক হিসাব ও সরকারি ফি</h3><p>ভ্যাট, কন্টিনজেন্সি, রাজউক অনুমোদন ফি, ওয়াসা, বিদ্যুৎ সংযোগ, ঋণের কিস্তি হিসাব।</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
         <div>
           <div class="card">
-            <div class="card-title">📈 আর্থিক চার্জ</div>
-            <div class="grid-2">
-              <div class="form-group"><label>ভ্যাট (%)</label>
-                <input type="number" id="vat" value="15" min="0" onchange="recalculate()"></div>
-              <div class="form-group"><label>কন্টিনজেন্সি (%)</label>
-                <input type="number" id="contingency" value="5" min="0" onchange="recalculate()"></div>
-              <div class="form-group"><label>কন্ট্রাক্টর মার্জিন (%)</label>
-                <input type="number" id="margin" value="10" min="0" onchange="recalculate()"></div>
-              <div class="form-group"><label>মুদ্রাস্ফীতি (%)</label>
-                <input type="number" id="inflation" value="3" min="0" onchange="recalculate()"></div>
+            <div class="card-header"><div class="card-title"><div class="card-title-icon">📈</div> আর্থিক চার্জ</div></div>
+            <div class="card-body">
+              <div class="grid-2">
+                <div class="fgroup"><label>ভ্যাট (%)</label><input type="number" id="vat" value="15" min="0" max="50" onchange="vp(this);recalculate()"></div>
+                <div class="fgroup"><label>কন্টিনজেন্সি (%)</label><input type="number" id="contingency" value="5" min="0" max="20" onchange="vp(this);recalculate()"></div>
+                <div class="fgroup"><label>কন্ট্রাক্টর মার্জিন (%)</label><input type="number" id="margin" value="10" min="0" max="30" onchange="vp(this);recalculate()"></div>
+                <div class="fgroup"><label>মুদ্রাস্ফীতি প্রভিশন (%)</label><input type="number" id="inflation" value="3" min="0" max="20" onchange="vp(this);recalculate()"></div>
+              </div>
             </div>
           </div>
           <div class="card">
-            <div class="card-title">🏦 ঋণ ক্যালকুলেটর</div>
-            <div class="form-group" style="margin-bottom:8px;"><label>ঋণ পরিমাণ (৳)</label>
-              <input type="number" id="loan-amt" value="5000000" onchange="calcLoan()"></div>
-            <div class="form-group" style="margin-bottom:8px;"><label>সুদ হার (% বার্ষিক)</label>
-              <input type="number" id="loan-rate" value="9" onchange="calcLoan()"></div>
-            <div class="form-group" style="margin-bottom:8px;"><label>মেয়াদ (বছর)</label>
-              <input type="number" id="loan-years" value="15" onchange="calcLoan()"></div>
-            <div class="loan-result">
-              <div style="font-size:12px; color:var(--text-muted);">মাসিক কিস্তি (EMI)</div>
-              <div class="monthly" id="emi-val">৳ ৫০,৭১৪</div>
-              <div style="font-size:11px; color:var(--text-muted); margin-top:4px;" id="loan-details">মোট পরিশোধ: ৳ ৯১,২৮,৫২০</div>
+            <div class="card-header"><div class="card-title"><div class="card-title-icon">🏛️</div> ঋণ (EMI) ক্যালকুলেটর</div></div>
+            <div class="card-body">
+              <div class="fgroup" style="margin-bottom:10px"><label>ঋণের পরিমাণ (৳)</label><input type="number" id="loan-amt" value="5000000" min="0" onchange="vp(this);calcLoan()"></div>
+              <div class="fgroup" style="margin-bottom:10px"><label>বার্ষিক সুদ হার (%)</label><input type="number" id="loan-rate" value="9" min="1" max="30" onchange="vp(this);calcLoan()"></div>
+              <div class="fgroup" style="margin-bottom:10px"><label>মেয়াদ (বছর)</label><input type="number" id="loan-years" value="15" min="1" max="30" onchange="vp(this);calcLoan()"></div>
+              <div class="loan-result">
+                <div style="font-size:11px;color:var(--text-muted);font-weight:600;margin-bottom:4px">মাসিক কিস্তি (EMI)</div>
+                <div class="loan-emi" id="emi-val">৳ ৫০,৭১৪</div>
+                <div class="loan-meta" id="loan-details">মোট পরিশোধ: ৳ ৯১,২৮,৫২০ | মোট সুদ: ৳ ৪১,২৮,৫২০</div>
+              </div>
             </div>
           </div>
         </div>
         <div>
           <div class="card">
-            <div class="card-title">🏛️ সরকারি ও আইনি ফি</div>
-            <div class="fee-row"><span>রাজউক অনুমোদন ফি</span><span id="rajuk-fee" style="font-weight:600;">৳ ০</span></div>
-            <div class="fee-row"><span>ওয়াসা সংযোগ ফি</span><span style="font-weight:600;">৳ ৩০,০০০</span></div>
-            <div class="fee-row"><span>বিদ্যুৎ সাবস্টেশন ফি</span><span id="elec-fee" style="font-weight:600;">৳ ০</span></div>
-            <div class="fee-row"><span>গ্যাস সংযোগ ফি</span><span id="gas-fee" style="font-weight:600;">৳ ০</span></div>
-            <div class="fee-row"><span>ভূমি রেজিস্ট্রেশন (৭%)</span><span id="reg-fee" style="font-weight:600;">৳ ০</span></div>
-            <div class="fee-row"><span>স্ট্যাম্প ডিউটি (১.৫%)</span><span id="stamp-fee" style="font-weight:600;">৳ ০</span></div>
-            <div class="fee-row"><span>ল্যান্ড ট্যাক্স (বার্ষিক)</span><span style="font-weight:600;">৳ ৫,০০০</span></div>
-            <div class="fee-row"><span style="font-weight:700;">মোট সরকারি ফি</span><span id="total-govt" style="font-weight:700; color:var(--primary-dark);">৳ ০</span></div>
-            <div style="margin-top:12px;">
-              <div class="form-group"><label>জমির মূল্য (৳) — রেজিস্ট্রেশনের জন্য</label>
-                <input type="number" id="land-price" value="0" onchange="recalculate()"></div>
+            <div class="card-header"><div class="card-title"><div class="card-title-icon">🏛️</div> সরকারি ও আইনি ফি</div></div>
+            <div class="card-body">
+              <div class="fee-row"><span class="fee-label">রাজউক অনুমোদন ফি</span><span class="fee-val" id="rajuk-fee">৳ ০</span></div>
+              <div class="fee-row"><span class="fee-label">ওয়াসা সংযোগ ফি</span><span class="fee-val" id="wasa-fee">৳ ৩০,০০০</span></div>
+              <div class="fee-row"><span class="fee-label">বিদ্যুৎ সাবস্টেশন ফি</span><span class="fee-val" id="elec-fee">৳ ০</span></div>
+              <div class="fee-row"><span class="fee-label">গ্যাস সংযোগ ফি</span><span class="fee-val" id="gas-fee">৳ ০</span></div>
+              <div class="fee-row"><span class="fee-label">ভূমি রেজিস্ট্রেশন (৭%)</span><span class="fee-val" id="reg-fee">৳ ০</span></div>
+              <div class="fee-row"><span class="fee-label">স্ট্যাম্প ডিউটি (১.৫%)</span><span class="fee-val" id="stamp-fee">৳ ০</span></div>
+              <div class="fee-row"><span class="fee-label">পরিবেশ ছাড়পত্র (ECO)</span><span class="fee-val" id="eco-fee">৳ ০</span></div>
+              <div class="fee-row"><span class="fee-label">ল্যান্ড ট্যাক্স (বার্ষিক)</span><span class="fee-val">৳ ৫,০০০</span></div>
+              <div class="fee-row total-row"><span class="fee-label">মোট সরকারি ফি</span><span class="fee-val" id="total-govt">৳ ০</span></div>
+              <div style="margin-top:14px">
+                <div class="fgroup"><label>জমির মূল্য (৳) — রেজিস্ট্রেশনের জন্য</label><input type="number" id="land-price" value="0" min="0" onchange="vp(this);recalculate()"></div>
+              </div>
             </div>
           </div>
           <div class="card">
-            <div class="card-title">📋 খরচের সারসংক্ষেপ</div>
-            <div class="breakdown-row"><span>মূল নির্মাণ</span><span id="br-base">৳ ০</span></div>
-            <div class="breakdown-row"><span>শ্রমিক ও যন্ত্র</span><span id="br-labor">৳ ০</span></div>
-            <div class="breakdown-row"><span>অতিরিক্ত সুবিধা</span><span id="br-extras">৳ ০</span></div>
-            <div class="breakdown-row"><span>তলা ফিনিশিং</span><span id="br-finish">৳ ০</span></div>
-            <div class="breakdown-row"><span>স্পেশাল ফিচারস</span><span id="br-special">৳ ০</span></div>
-            <div class="breakdown-row"><span>ভ্যাট ও চার্জ</span><span id="br-vat">৳ ০</span></div>
-            <div class="breakdown-row"><span>সরকারি ফি</span><span id="br-govt">৳ ০</span></div>
-            <div class="breakdown-row total"><span>সর্বমোট</span><span id="br-total">৳ ০</span></div>
+            <div class="card-header"><div class="card-title"><div class="card-title-icon">📋</div> সম্পূর্ণ খরচ বিভাজন</div></div>
+            <div class="card-body">
+              <div class="breakdown-row"><span class="br-label">মূল নির্মাণ খরচ</span><span class="br-val" id="br-base">৳ ০</span></div>
+              <div class="breakdown-row"><span class="br-label">শ্রমিক ও যন্ত্রপাতি</span><span class="br-val" id="br-labor">৳ ০</span></div>
+              <div class="breakdown-row"><span class="br-label">অতিরিক্ত সুবিধা</span><span class="br-val" id="br-extras">৳ ০</span></div>
+              <div class="breakdown-row"><span class="br-label">স্পেশাল ফিচারস</span><span class="br-val" id="br-special">৳ ০</span></div>
+              <div class="breakdown-row"><span class="br-label">ভ্যাট ও আর্থিক চার্জ</span><span class="br-val" id="br-vat">৳ ০</span></div>
+              <div class="breakdown-row"><span class="br-label">সরকারি ফি</span><span class="br-val" id="br-govt">৳ ০</span></div>
+              <div class="breakdown-row breakdown-total"><span class="br-label">সর্বমোট নির্মাণ ব্যয়</span><span class="br-val" id="br-total">৳ ০</span></div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ====== BOQ (NEW) ====== -->
-    <div class="section" id="section-boq">
-      <div class="card">
-        <div class="card-title">📋 Bill of Quantity (BOQ) <span class="badge">কন্ট্রাক্টর/আর্কিটেক্টের জন্য</span></div>
-        <div style="margin-bottom:12px; display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="btn btn-primary btn-sm" onclick="exportBOQ()">📥 BOQ ডাউনলোড (CSV)</button>
-          <button class="btn btn-outline btn-sm" onclick="printBOQ()">🖨️ প্রিন্ট BOQ</button>
-        </div>
-        <div id="boq-container"></div>
+    <!-- ===== SPECIAL FEATURES ===== -->
+    <div class="section" id="section-special">
+      <div class="section-intro">
+        <div class="section-intro-icon">⭐</div>
+        <div><h3>স্পেশাল ফিচারস — <span id="special-bldg-name">বিল্ডিং</span></h3><p>বিল্ডিং টাইপ পরিবর্তন করলে এই তালিকা স্বয়ংক্রিয়ভাবে লোড হবে। প্রতিটি বিল্ডিং টাইপের জন্য ৫০+ বিশেষ ফিচার।</p></div>
       </div>
-    </div>
-
-    <!-- ====== CONTRACT (NEW) ====== -->
-    <div class="section" id="section-contract">
       <div class="card">
-        <div class="card-title">📑 কন্ট্রাক্ট ম্যানেজমেন্ট <span class="badge">পেমেন্ট মাইলস্টোন</span></div>
-        <div class="grid-2" style="margin-bottom:14px;">
-          <div class="form-group"><label>ঠিকাদারের নাম</label>
-            <input type="text" id="contractor-name" placeholder="মো. রহিম কন্ট্রাকশন"></div>
-          <div class="form-group"><label>চুক্তির তারিখ</label>
-            <input type="text" id="contract-date" placeholder="০১/০১/২০২৫"></div>
-        </div>
-        <div style="display:grid; grid-template-columns:2fr 1fr 1fr 120px; gap:10px; padding:8px 0; border-bottom:2px solid var(--border); font-size:11px; font-weight:700; color:var(--text-muted);">
-          <span>কাজের বিবরণ</span><span>পরিমাণ (৳)</span><span>তারিখ</span><span>অবস্থা</span>
-        </div>
-        <div id="milestone-list"></div>
-        <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="btn btn-outline btn-sm" onclick="addMilestone()">+ মাইলস্টোন যোগ</button>
-          <button class="btn btn-primary btn-sm" onclick="generateContract()">📄 চুক্তিপত্র জেনারেট</button>
-        </div>
-        <div id="contract-summary" style="margin-top:12px; padding:10px; background:var(--bg); border-radius:6px; font-size:13px; display:none;"></div>
-      </div>
-    </div>
-
-    <!-- ====== AI SECTION (NEW) ====== -->
-    <div class="section" id="section-ai">
-      <div class="alert alert-info">🤖 AI আপনার প্রজেক্টের ডেটা বিশ্লেষণ করে সাজেশন দেবে। বাংলায় প্রশ্ন করুন।</div>
-      <div class="card">
-        <div class="card-title">🤖 AI নির্মাণ উপদেষ্টা <span class="badge">Claude AI</span></div>
-        <div class="ai-chat-box">
-          <div class="ai-messages" id="ai-messages">
-            <div class="ai-msg bot">আস্সালামু আলাইকুম! আমি আপনার নির্মাণ প্রজেক্টের AI উপদেষ্টা। আপনার প্রজেক্টের খরচ কমানো, ম্যাটেরিয়াল নির্বাচন, বা যেকোনো প্রশ্ন করুন। 🏗️</div>
-          </div>
-          <div class="ai-input-row">
-            <input type="text" id="ai-input" placeholder="যেমন: আমার বাজেট কমানোর উপায় কী? বা মাটি পরীক্ষা কি দরকার?" onkeydown="if(event.key==='Enter') sendAI()">
-            <button class="btn btn-primary" onclick="sendAI()">পাঠান ↗</button>
+        <div class="card-header">
+          <div class="card-title"><div class="card-title-icon">⭐</div> <span id="special-card-title">স্পেশাল ফিচারস</span> <span class="chip chip-amber" id="feat-count-chip">০টি</span></div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-sm" onclick="clearAllFeatures()">সব বাতিল</button>
+            <button class="btn btn-primary btn-sm" onclick="selectCommonFeatures()">সাধারণ ফিচার নির্বাচন</button>
           </div>
         </div>
-        <div style="margin-top:12px;">
-          <div style="font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:8px;">দ্রুত প্রশ্নসমূহ:</div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button class="btn btn-sm" style="background:var(--bg); border:1px solid var(--border);" onclick="quickAI('আমার প্রজেক্টের খরচ কমানোর উপায় বলুন')">খরচ কমানো</button>
-            <button class="btn btn-sm" style="background:var(--bg); border:1px solid var(--border);" onclick="quickAI('সেরা ম্যাটেরিয়াল কোনটি?')">সেরা ম্যাটেরিয়াল</button>
-            <button class="btn btn-sm" style="background:var(--bg); border:1px solid var(--border);" onclick="quickAI('নির্মাণ সময় কমানোর কৌশল কী?')">সময় কমানো</button>
-            <button class="btn btn-sm" style="background:var(--bg); border:1px solid var(--border);" onclick="quickAI('ফাউন্ডেশনের জন্য কী পরামর্শ দেবেন?')">ফাউন্ডেশন পরামর্শ</button>
-            <button class="btn btn-sm" style="background:var(--bg); border:1px solid var(--border);" onclick="quickAI('বাজেটের মধ্যে কোথায় খরচ বাড়ানো উচিত?')">বাজেট অপ্টিমাইজ</button>
+        <div class="card-body">
+          <div class="feature-grid" id="special-features"></div>
+          <div style="margin-top:16px;padding:14px 18px;background:linear-gradient(135deg,var(--green-50),#fff);border-radius:var(--radius-sm);border:1px solid var(--green-200);display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:11px;color:var(--text-muted)">নির্বাচিত: <span id="feat-selected-count">০</span> ফিচার</div>
+              <div style="font-size:14px;font-weight:700;color:var(--text-secondary)">স্পেশাল ফিচার মোট খরচ:</div>
+            </div>
+            <div id="special-total" style="font-size:24px;font-weight:800;color:var(--green-700)">৳ ০</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ====== PRICE TREND (NEW) ====== -->
-    <div class="section" id="section-prices">
-      <div class="card">
-        <div class="card-title">📈 ম্যাটেরিয়াল মূল্য ট্রেন্ড <span class="badge">গত ১২ মাস</span></div>
-        <div class="inner-tabs">
-          <button class="inner-tab active" onclick="showPriceChart('rod',this)">রড (kg)</button>
-          <button class="inner-tab" onclick="showPriceChart('cement',this)">সিমেন্ট (বস্তা)</button>
-          <button class="inner-tab" onclick="showPriceChart('brick',this)">ইট (হাজার)</button>
-          <button class="inner-tab" onclick="showPriceChart('sand',this)">বালি (cft)</button>
-        </div>
-        <div class="chart-wrap" style="height:240px;"><canvas id="priceChart" role="img" aria-label="মূল্য ট্রেন্ড চার্ট"></canvas></div>
-        <div id="price-forecast" style="margin-top:12px; padding:10px; background:var(--bg); border-radius:6px; font-size:13px;"></div>
+    <!-- ===== LAWS ===== -->
+    <div class="section" id="section-laws">
+      <div class="section-intro">
+        <div class="section-intro-icon">⚖️</div>
+        <div><h3>বাংলাদেশ নির্মাণ আইন ও বিধিমালা</h3><p>BNBC 2020, রাজউক বিধিমালা, পরিবেশ আইন, শ্রম আইন সহ সকল গুরুত্বপূর্ণ নির্মাণ আইন ও প্রয়োগযোগ্যতা।</p></div>
       </div>
-      <div class="card">
-        <div class="card-title">📊 বর্তমান বাজার মূল্য (ঢাকা)</div>
-        <div class="grid-4">
-          <div style="text-align:center; padding:12px; background:var(--bg); border-radius:var(--radius-sm); border:1px solid var(--border);">
-            <div style="font-size:11px; color:var(--text-muted);">রড (প্রতি kg)</div>
-            <div style="font-size:20px; font-weight:700; color:var(--primary);">৳ ৯৫</div>
-            <div style="font-size:10px; color:var(--success);">▲ ৩% মাসিক</div>
-          </div>
-          <div style="text-align:center; padding:12px; background:var(--bg); border-radius:var(--radius-sm); border:1px solid var(--border);">
-            <div style="font-size:11px; color:var(--text-muted);">সিমেন্ট (বস্তা)</div>
-            <div style="font-size:20px; font-weight:700; color:var(--primary);">৳ ৫২০</div>
-            <div style="font-size:10px; color:var(--danger);">▼ ১% মাসিক</div>
-          </div>
-          <div style="text-align:center; padding:12px; background:var(--bg); border-radius:var(--radius-sm); border:1px solid var(--border);">
-            <div style="font-size:11px; color:var(--text-muted);">ইট (প্রতি পিস)</div>
-            <div style="font-size:20px; font-weight:700; color:var(--primary);">৳ ১৪</div>
-            <div style="font-size:10px; color:var(--success);">▲ ২% মাসিক</div>
-          </div>
-          <div style="text-align:center; padding:12px; background:var(--bg); border-radius:var(--radius-sm); border:1px solid var(--border);">
-            <div style="font-size:11px; color:var(--text-muted);">বালি (প্রতি cft)</div>
-            <div style="font-size:20px; font-weight:700; color:var(--primary);">৳ ৩৮</div>
-            <div style="font-size:10px; color:var(--text-muted);">→ স্থিতিশীল</div>
-          </div>
+      <div class="law-category">
+        <div class="law-category-header">🏗️ BNBC 2020 — বাংলাদেশ ন্যাশনাল বিল্ডিং কোড</div>
+        <div class="law-category-body">
+          <table class="law-table">
+            <thead><tr><th>বিধান/ধারা</th><th>বিষয়বস্তু</th><th>প্রযোজ্যতা</th></tr></thead>
+            <tbody>
+              <tr><td>BNBC Part 1 Ch.1 <span class="law-tag lt-mandatory">বাধ্যতামূলক</span></td><td>নির্মাণের সংজ্ঞা, শ্রেণীবিভাগ ও সাধারণ প্রয়োজনীয়তা। সব বিল্ডিং এই কোড অনুযায়ী নির্মাণ করতে হবে।</td><td>সকল নির্মাণ</td></tr>
+              <tr><td>BNBC Part 3 — স্ট্রাকচারাল ডিজাইন <span class="law-tag lt-mandatory">বাধ্যতামূলক</span></td><td>সিসমিক জোন অনুযায়ী স্ট্রাকচারাল লোড ক্যালকুলেশন। উইন্ড লোড, লাইভ লোড, ডেড লোড নির্ধারণ। ভূমিকম্প সহনশীল ডিজাইন বাধ্যতামূলক।</td><td>সকল RCC বিল্ডিং</td></tr>
+              <tr><td>BNBC Part 4 — ফায়ার সেফটি <span class="law-tag lt-mandatory">বাধ্যতামূলক</span></td><td>৩ তলার উপর সব বিল্ডিংয়ে ফায়ার এক্সিট, অ্যালার্ম, এক্সটিংগুইশার বাধ্যতামূলক। হাসপাতাল ও গার্মেন্টসে অতিরিক্ত বিধান।</td><td>৩+ তলা সব বিল্ডিং</td></tr>
+              <tr><td>BNBC Part 6 — প্লাম্বিং <span class="law-tag lt-recommended">প্রস্তাবিত</span></td><td>পানির সংযোগ, পয়ঃনিষ্কাশন, স্যানিটেশন বিধিমালা। ড্রেনেজ ক্যাপাসিটি ও গ্রেডিয়েন্ট নির্ধারণ।</td><td>সকল আবাসিক ও বাণিজ্যিক</td></tr>
+              <tr><td>BNBC Part 8 — এনার্জি <span class="law-tag lt-recommended">প্রস্তাবিত</span></td><td>এনার্জি এফিসিয়েন্ট বিল্ডিং ডিজাইন গাইডলাইন। ইনসুলেশন, সৌরশক্তি ব্যবহারে উৎসাহ।</td><td>বড় বাণিজ্যিক বিল্ডিং</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
-    </div>
-
-    <!-- ====== WEATHER (NEW) ====== -->
-    <div class="section" id="section-weather">
-      <div class="card">
-        <div class="card-title">🌤️ আবহাওয়া ইন্টিগ্রেশন ও বিলম্ব প্রাক্কলন</div>
-        <div class="weather-card">
-          <div class="w-item"><div class="w-icon">🌧️</div><div class="w-label">বর্ষা মৌসুম</div><div class="w-val">জুন–সেপ্টেম্বর</div></div>
-          <div class="w-item"><div class="w-icon">⛅</div><div class="w-label">শীতকাল</div><div class="w-val">নভে–ফেব্রুয়ারি</div></div>
-          <div class="w-item"><div class="w-icon">☀️</div><div class="w-label">গ্রীষ্মকাল</div><div class="w-val">মার্চ–মে</div></div>
-          <div class="w-item"><div class="w-icon">🌀</div><div class="w-label">সাইক্লোন ঝুঁকি</div><div class="w-val">মে, অক্টোবর–নভে</div></div>
+      <div class="law-category">
+        <div class="law-category-header">🏛️ রাজউক বিধিমালা — রাজধানী উন্নয়ন কর্তৃপক্ষ</div>
+        <div class="law-category-body">
+          <table class="law-table">
+            <thead><tr><th>বিধান</th><th>বিষয়বস্তু</th><th>প্রযোজ্যতা</th></tr></thead>
+            <tbody>
+              <tr><td>DAP 2022-2035 <span class="law-tag lt-mandatory">বাধ্যতামূলক</span></td><td>ঢাকার বিস্তারিত এলাকা পরিকল্পনা। জমির ব্যবহার, ভবনের উচ্চতা, FAR নির্ধারণ। প্লট অনুযায়ী সর্বোচ্চ তলার সংখ্যা নির্ধারিত।</td><td>ঢাকা মহানগরী</td></tr>
+              <tr><td>বিল্ডিং নির্মাণ বিধিমালা ২০০৮ <span class="law-tag lt-mandatory">বাধ্যতামূলক</span></td><td>অনুমোদন ছাড়া নির্মাণ নিষিদ্ধ। প্ল্যান অনুমোদনের পর নির্মাণ শুরু। সম্পন্নের সার্টিফিকেট (OC) বাধ্যতামূলক।</td><td>রাজউক এলাকা</td></tr>
+              <tr><td>FAR (Floor Area Ratio) <span class="law-tag lt-mandatory">বাধ্যতামূলক</span></td><td>প্লটের আকার অনুযায়ী FAR ভিন্ন। ৩ কাঠা পর্যন্ত FAR ২.৫, ৩-৫ কাঠা FAR ৩.০, ৫ কাঠার উপর FAR ৩.৫-৪.৫।</td><td>ঢাকা শহর</td></tr>
+              <tr><td>সেটব্যাক বিধিমালা <span class="law-tag lt-mandatory">বাধ্যতামূলক</span></td><td>সামনে ন্যূনতম ২ মিটার, পেছনে ১.৫ মিটার, পাশে ১.৫ মিটার ছাড় দিতে হবে। বড় প্লটে বেশি সেটব্যাক।</td><td>সকল ভবন</td></tr>
+              <tr><td>পার্কিং বিধিমালা <span class="law-tag lt-mandatory">বাধ্যতামূলক</span></td><td>আবাসিক: প্রতি ২ ফ্ল্যাটে ১ পার্কিং। বাণিজ্যিক: প্রতি ৫০০ sqft-এ ১ পার্কিং। হাসপাতাল: প্রতি ৫ বেডে ১ পার্কিং।</td><td>সব বিল্ডিং</td></tr>
+              <tr><td>লিফট বিধিমালা <span class="law-tag lt-mandatory">বাধ্যতামূলক</span></td><td>৬ তলার উপর লিফট বাধ্যতামূলক। হাসপাতালে ৩ তলার উপর লিফট আবশ্যক। লিফটের ক্যাপাসিটি ও গতি নির্ধারিত।</td><td>৬+ তলা ভবন</td></tr>
+            </tbody>
+          </table>
         </div>
-        <div style="margin-top:16px;">
-          <div class="form-group"><label>নির্মাণ শুরুর মাস</label>
-            <select id="start-month" onchange="calcWeatherDelay()">
-              <option value="1">জানুয়ারি</option><option value="2">ফেব্রুয়ারি</option>
-              <option value="3">মার্চ</option><option value="4">এপ্রিল</option>
-              <option value="5">মে</option><option value="6">জুন</option>
-              <option value="7">জুলাই</option><option value="8">আগস্ট</option>
-              <option value="9">সেপ্টেম্বর</option><option value="10">অক্টোবর</option>
-              <option value="11">নভেম্বর</option><option value="12">ডিসেম্বর</option>
-            </select>
-          </div>
-        </div>
-        <div id="weather-analysis" style="margin-top:14px;"></div>
       </div>
-      <div class="card">
-        <div class="card-title">📅 মাসিক কার্যকর কর্মদিন (ঐতিহাসিক গড়)</div>
-        <div class="chart-wrap" style="height:200px;"><canvas id="workdayChart" role="img" aria-label="মাসিক কর্মদিন চার্ট"></canvas></div>
-      </div>
-    </div>
-
-    <!-- ====== CHECKLIST (NEW) ====== -->
-    <div class="section" id="section-checklist">
-      <div class="card">
-        <div class="card-title">✅ নির্মাণ কোয়ালিটি চেকলিস্ট <span class="badge">ISO মান</span></div>
-        <div style="margin-bottom:12px; font-size:13px; color:var(--text-muted);">
-          সম্পন্ন: <strong id="checklist-done">০</strong> / <strong id="checklist-total">০</strong> &nbsp;|&nbsp;
-          <div class="progress-bar-wrap" style="display:inline-block; width:200px; vertical-align:middle;">
-            <div class="progress-bar-fill" id="checklist-bar" style="width:0%; background:var(--primary);"></div>
-          </div>
+      <div class="law-category">
+        <div class="law-category-header">🌿 পরিবেশ আইন ও ছাড়পত্র</div>
+        <div class="law-category-body">
+          <table class="law-table">
+            <thead><tr><th>আইন/বিধান</th><th>বিষয়বস্তু</th><th>প্রযোজ্যতা</th></tr></thead>
+            <tbody>
+              <tr><td>পরিবেশ সংরক্ষণ আইন ১৯৯৫ <span class="law-tag lt-mandatory">বাধ্যতামূলক</span></td><td>শিল্প কারখানা, হাসপাতাল, হোটেল নির্মাণে পরিবেশ অধিদপ্তরের ছাড়পত্র (ECO) নিতে হবে।</td><td>শিল্প, হাসপাতাল, হোটেল</td></tr>
+              <tr><td>EIA (পরিবেশ প্রভাব মূল্যায়ন) <span class="law-tag lt-mandatory">বাধ্যতামূলক</span></td><td>১০ কোটি+ বিনিয়োগের প্রকল্পে EIA রিপোর্ট জমা দিতে হবে। বন এলাকা ও জলাভূমির ৫০০ মিটারের মধ্যে নির্মাণ নিষিদ্ধ।</td><td>বড় প্রকল্প</td></tr>
+              <tr><td>ETP (বর্জ্য পরিশোধন) <span class="law-tag lt-mandatory">বাধ্যতামূলক</span></td><td>গার্মেন্টস, ডাইং, ফার্মাসিউটিক্যালস কারখানায় ETP বাধ্যতামূলক। বর্জ্য পানি পরিশোধন না করলে জরিমানা।</td><td>শিল্প প্রতিষ্ঠান</td></tr>
+              <tr><td>নবায়নযোগ্য শক্তি নীতি ২০২২ <span class="law-tag lt-optional">ঐচ্ছিক</span></td><td>১ মেগাওয়াট+ শক্তি খরচের বিল্ডিংয়ে ৫% সোলার বাধ্যতামূলক। সোলার স্থাপনে সরকারি ভর্তুকি প্রযোজ্য।</td><td>বড় বিল্ডিং</td></tr>
+            </tbody>
+          </table>
         </div>
-        <div class="inner-tabs" id="checklist-phase-tabs"></div>
-        <div id="checklist-container"></div>
       </div>
-    </div>
-
-    <!-- ====== COMPARE (NEW) ====== -->
-    <div class="section" id="section-compare">
-      <div class="card">
-        <div class="card-title">📊 মাল্টি-প্রজেক্ট তুলনা ড্যাশবোর্ড <span class="badge">১০টি পর্যন্ত</span></div>
-        <div style="margin-bottom:12px; display:flex; gap:8px;">
-          <button class="btn btn-primary btn-sm" onclick="saveToCompare()">+ বর্তমান প্রজেক্ট যোগ করুন</button>
-          <button class="btn btn-sm" style="background:var(--bg); border:1px solid var(--border);" onclick="clearCompare()">🗑️ সাফ করুন</button>
+      <div class="law-category">
+        <div class="law-category-header">👷 শ্রম আইন ও নিরাপত্তা বিধিমালা</div>
+        <div class="law-category-body">
+          <table class="law-table">
+            <thead><tr><th>আইন</th><th>বিষয়বস্তু</th><th>প্রযোজ্যতা</th></tr></thead>
+            <tbody>
+              <tr><td>বাংলাদেশ শ্রম আইন ২০০৬ <span class="law-tag lt-mandatory">বাধ্যতামূলক</span></td><td>নির্মাণ শ্রমিকদের ন্যূনতম মজুরি: দক্ষ মিস্ত্রি ৮৫০+ টাকা/দিন, সাধারণ শ্রমিক ৫৫০+ টাকা/দিন (২০২৪)। ৮ ঘন্টার বেশি কাজে অতিরিক্ত মজুরি।</td><td>সকল নির্মাণ প্রকল্প</td></tr>
+              <tr><td>নির্মাণ নিরাপত্তা বিধিমালা <span class="law-tag lt-mandatory">বাধ্যতামূলক</span></td><td>PPE (হেলমেট, জুতা, গ্লাভস) বাধ্যতামূলক। ৩+ মিটার উচ্চতায় হার্নেস আবশ্যক। সাইটে ফার্স্ট এইড কিট।</td><td>সকল নির্মাণ</td></tr>
+              <tr><td>কর্মক্ষেত্রে দুর্ঘটনা বিমা <span class="law-tag lt-mandatory">বাধ্যতামূলক</span></td><td>নির্মাণ শ্রমিকদের দুর্ঘটনা বিমা কভারেজ থাকতে হবে। মৃত্যুতে পরিবারকে ক্ষতিপূরণ বাধ্যতামূলক।</td><td>সকল নির্মাণ প্রকল্প</td></tr>
+              <tr><td>শিশুশ্রম নিষেধাজ্ঞা <span class="law-tag lt-mandatory">বাধ্যতামূলক</span></td><td>১৮ বছরের কম বয়সী কাউকে নির্মাণ কাজে নিয়োগ সম্পূর্ণ নিষিদ্ধ। লঙ্ঘনে জেল ও জরিমানা।</td><td>সকল নির্মাণ</td></tr>
+            </tbody>
+          </table>
         </div>
-        <div id="compare-container">
-          <div class="alert alert-info" style="margin:0;">প্রজেক্ট হিসাব করুন, তারপর "+ বর্তমান প্রজেক্ট যোগ করুন" ক্লিক করুন।</div>
+      </div>
+      <div class="law-category">
+        <div class="law-category-header">🏦 আর্থিক ও কর আইন</div>
+        <div class="law-category-body">
+          <table class="law-table">
+            <thead><tr><th>আইন/বিধান</th><th>বিষয়বস্তু</th><th>প্রযোজ্যতা</th></tr></thead>
+            <tbody>
+              <tr><td>ভ্যাট আইন ২০১২ <span class="law-tag lt-mandatory">বাধ্যতামূলক</span></td><td>নির্মাণ সেবায় ১৫% ভ্যাট। কন্ট্রাক্টর মার্জিনের উপর ৭.৫% ভ্যাট। উপকরণ কেনায় উৎস কর্তন।</td><td>নিবন্ধিত ঠিকাদার</td></tr>
+              <tr><td>আয়কর অধ্যাদেশ ১৯৮৪ <span class="law-tag lt-mandatory">বাধ্যতামূলক</span></td><td>নির্মাণ চুক্তিতে ৭% উৎস কর কর্তন (TDS)। ঠিকাদারের আয়কর রিটার্ন বাধ্যতামূলক।</td><td>নিবন্ধিত প্রতিষ্ঠান</td></tr>
+              <tr><td>ভূমি নিবন্ধন আইন <span class="law-tag lt-mandatory">বাধ্যতামূলক</span></td><td>জমি কেনার সময় ৭% রেজিস্ট্রেশন ফি + ১.৫% স্ট্যাম্প ডিউটি প্রদান আবশ্যক।</td><td>জমি ক্রয়</td></tr>
+              <tr><td>নগর উন্নয়ন চার্জ <span class="law-tag lt-optional">ঐচ্ছিক</span></td><td>রাজউক ও পৌরসভার উন্নয়ন চার্জ — আয়তন ও তলা অনুযায়ী ভিন্ন।</td><td>শহর এলাকা</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
 
-    <!-- ====== BADGES (NEW) ====== -->
-    <div class="section" id="section-badges">
-      <div class="card">
-        <div class="card-title">🏅 গেমিফিকেশন ব্যাজ ও অর্জন</div>
-        <div class="badge-grid" id="badge-grid"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">📊 আপনার পরিসংখ্যান</div>
-        <div class="grid-4">
-          <div style="text-align:center; padding:14px; background:var(--bg); border-radius:var(--radius-sm);">
-            <div style="font-size:28px; font-weight:700; color:var(--primary);" id="stat-calcs">০</div>
-            <div style="font-size:12px; color:var(--text-muted);">মোট হিসাব</div>
-          </div>
-          <div style="text-align:center; padding:14px; background:var(--bg); border-radius:var(--radius-sm);">
-            <div style="font-size:28px; font-weight:700; color:var(--accent);" id="stat-projects">০</div>
-            <div style="font-size:12px; color:var(--text-muted);">সেভ করা প্রজেক্ট</div>
-          </div>
-          <div style="text-align:center; padding:14px; background:var(--bg); border-radius:var(--radius-sm);">
-            <div style="font-size:28px; font-weight:700; color:var(--info);" id="stat-badges">০</div>
-            <div style="font-size:12px; color:var(--text-muted);">অর্জিত ব্যাজ</div>
-          </div>
-          <div style="text-align:center; padding:14px; background:var(--bg); border-radius:var(--radius-sm);">
-            <div style="font-size:28px; font-weight:700; color:var(--success);" id="stat-score">০</div>
-            <div style="font-size:12px; color:var(--text-muted);">গড় স্কোর</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ====== REPORT ====== -->
+    <!-- ===== REPORT ===== -->
     <div class="section" id="section-report">
-      <div class="report-header">
-        <div style="font-size:22px; font-weight:700;">🏗️ নির্মাণ ব্যয় অনুমান রিপোর্ট</div>
-        <div style="font-size:12px; opacity:0.8; margin-top:4px;" id="report-date"></div>
+      <div class="report-banner">
+        <h2>🏗️ নির্মাণ ব্যয় অনুমান রিপোর্ট</h2>
+        <p id="report-meta">প্রজেক্টের বিস্তারিত খরচ বিশ্লেষণ</p>
+        <div class="report-pills" id="report-pills"></div>
       </div>
-      <div class="grid-2">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
         <div class="card">
-          <div class="card-title">📊 খরচ বিভাজন</div>
-          <div class="chart-wrap" style="height:240px;"><canvas id="donutChart" role="img" aria-label="ডোনাট চার্ট"></canvas></div>
-          <div id="donut-legend" style="margin-top:10px; display:flex; flex-wrap:wrap; gap:8px; font-size:11px;"></div>
+          <div class="card-header"><div class="card-title"><div class="card-title-icon">📊</div> খরচ বিভাজন</div></div>
+          <div class="card-body">
+            <div class="chart-wrap" style="height:230px"><canvas id="donutChart"></canvas></div>
+            <div class="legend-grid" id="donut-legend"></div>
+          </div>
         </div>
         <div class="card">
-          <div class="card-title">📋 বিস্তারিত হিসাব</div>
-          <div id="detailed-breakdown" style="font-size:13px;"></div>
+          <div class="card-header"><div class="card-title"><div class="card-title-icon">📋</div> বিস্তারিত হিসাব</div></div>
+          <div class="card-body" id="detailed-breakdown"></div>
         </div>
       </div>
       <div class="card">
-        <div class="card-title">🏢 তলা অনুযায়ী খরচ</div>
-        <div class="chart-wrap" style="height:200px;"><canvas id="floorChart" role="img" aria-label="তলা চার্ট"></canvas></div>
+        <div class="card-header"><div class="card-title"><div class="card-title-icon">🏢</div> তলা অনুযায়ী খরচ (প্রথম ১২ তলা)</div></div>
+        <div class="card-body"><div class="chart-wrap" style="height:200px"><canvas id="floorChart"></canvas></div></div>
       </div>
       <div class="card">
-        <div class="card-title">📱 QR কোড রিপোর্ট <span class="badge">নতুন</span></div>
-        <div class="grid-2">
-          <div>
-            <div id="qr-code" style="display:inline-block; padding:12px; background:#fff; border-radius:8px; border:1px solid var(--border);"></div>
-            <div style="font-size:11px; color:var(--text-muted); margin-top:8px;">QR কোড স্ক্যান করুন — প্রজেক্ট ড্যাশবোর্ড খুলবে</div>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:8px;">
-            <button class="btn btn-primary" onclick="exportPDF()">📄 PDF রিপোর্ট</button>
-            <button class="btn btn-outline" onclick="exportCSV()">📊 Excel (CSV)</button>
-            <button class="btn btn-accent" onclick="exportBOQ()">📋 BOQ ডাউনলোড</button>
-            <button class="btn btn-outline" onclick="printReport()">🖨️ প্রিন্ট</button>
-            <button class="btn btn-info" onclick="shareReport()" style="color:#fff;">🔗 শেয়ার লিংক</button>
-          </div>
+        <div class="card-header"><div class="card-title"><div class="card-title-icon">📤</div> এক্সপোর্ট ও শেয়ার</div></div>
+        <div class="card-body" style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="exportPDF()">📄 PDF ডাউনলোড</button>
+          <button class="btn btn-outline" onclick="exportCSV()">📊 Excel (CSV)</button>
+          <button class="btn btn-ghost" onclick="printReport()">🖨️ প্রিন্ট</button>
+          <button class="btn btn-info" onclick="shareReport()">🔗 লিংক কপি</button>
         </div>
       </div>
     </div>
 
-  </div>
-</div>
-</div>
-
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
 <script>
-// ===== CONSTANTS =====
-const districts = {
+// ================================================================
+// DATA LAYER
+// ================================================================
+const DISTRICTS = {
   dhaka:['ঢাকা','গাজীপুর','নারায়ণগঞ্জ','মুন্সীগঞ্জ','মানিকগঞ্জ','নরসিংদী','কিশোরগঞ্জ','টাঙ্গাইল','ফরিদপুর','মাদারীপুর','শরীয়তপুর','রাজবাড়ী','গোপালগঞ্জ'],
   chittagong:['চট্টগ্রাম','কক্সবাজার','বান্দরবান','রাঙ্গামাটি','খাগড়াছড়ি','ফেনী','লক্ষ্মীপুর','নোয়াখালী','কুমিল্লা','চাঁদপুর','ব্রাহ্মণবাড়িয়া'],
   rajshahi:['রাজশাহী','নওগাঁ','নাটোর','চাঁপাইনবাবগঞ্জ','বগুড়া','পাবনা','সিরাজগঞ্জ','জয়পুরহাট'],
@@ -993,891 +1565,812 @@ const districts = {
   rangpur:['রংপুর','দিনাজপুর','গাইবান্ধা','কুড়িগ্রাম','লালমনিরহাট','নীলফামারী','পঞ্চগড়','ঠাকুরগাঁও'],
   mymensingh:['ময়মনসিংহ','নেত্রকোনা','জামালপুর','শেরপুর']
 };
-const upazilas = {
-  'ঢাকা':['মিরপুর','গুলশান','মতিঝিল','উত্তরা','ধানমন্ডি','মোহাম্মদপুর','লালবাগ','রমনা','সাভার','ডেমরা'],
-  'চট্টগ্রাম':['কোতোয়ালি','পাঁচলাইশ','চান্দগাঁও','পতেঙ্গা','বায়েজিদ','হালিশহর','বন্দর','সীতাকুণ্ড'],
-  'কক্সবাজার':['কক্সবাজার সদর','চকোরিয়া','রামু','উখিয়া','টেকনাফ','মহেশখালী'],
-  'গাজীপুর':['গাজীপুর সদর','কালিয়াকৈর','কালীগঞ্জ','কাপাসিয়া','শ্রীপুর'],
+const UPAZILAS = {
+  'ঢাকা':['মিরপুর','গুলশান','মতিঝিল','উত্তরা','ধানমন্ডি','মোহাম্মদপুর','লালবাগ','রমনা','শাহবাগ','সাভার','ডেমরা','খিলগাঁও','বাড্ডা','কামরাঙ্গীরচর','দোহার','নবাবগঞ্জ','কেরানীগঞ্জ'],
+  'গাজীপুর':['গাজীপুর সদর','কালিয়াকৈর','কালীগঞ্জ','কাপাসিয়া','শ্রীপুর','টঙ্গী'],
   'নারায়ণগঞ্জ':['নারায়ণগঞ্জ সদর','আড়াইহাজার','বন্দর','রূপগঞ্জ','সোনারগাঁও'],
-  'রাঙ্গামাটি':['রাঙ্গামাটি সদর','কাপ্তাই','বাঘাইছড়ি','বরকল','লংগদু'],
-  'বান্দরবান':['বান্দরবান সদর','আলীকদম','নাইক্ষ্যংছড়ি','রোয়াংছড়ি','রুমা'],
-  'সিলেট':['সিলেট সদর','বালাগঞ্জ','বিয়ানীবাজার','গোলাপগঞ্জ','জকিগঞ্জ'],
-  'খুলনা':['খুলনা সদর','দাকোপ','কয়রা','পাইকগাছা','বটিয়াঘাটা'],
-  'বরিশাল':['বরিশাল সদর','বানারীপাড়া','বাবুগঞ্জ','বাকেরগঞ্জ','হিজলা'],
-  'রাজশাহী':['রাজশাহী সদর','বোয়ালমারী','পুঠিয়া','মোহনপুর','বাগমারা'],
-  'রংপুর':['রংপুর সদর','কাউনিয়া','গঙ্গাচড়া','মিঠাপুকুর'],
-  'ময়মনসিংহ':['ময়মনসিংহ সদর','ভালুকা','গফরগাঁও','ফুলবাড়িয়া','ত্রিশাল'],
+  'চট্টগ্রাম':['কোতোয়ালি','পাঁচলাইশ','চান্দগাঁও','পতেঙ্গা','হালিশহর','বন্দর','সীতাকুণ্ড','মিরসরাই','রাউজান','আনোয়ারা','বোয়ালখালী','পটিয়া','লোহাগাড়া','সাতকানিয়া'],
+  'কক্সবাজার':['কক্সবাজার সদর','চকোরিয়া','রামু','উখিয়া','টেকনাফ','মহেশখালী','কুতুবদিয়া','পেকুয়া'],
+  'রাঙ্গামাটি':['রাঙ্গামাটি সদর','কাপ্তাই','বাঘাইছড়ি','বরকল','লংগদু','রাজস্থলী','বেলাইছড়ি','নানিয়ারচর'],
+  'বান্দরবান':['বান্দরবান সদর','আলীকদম','নাইক্ষ্যংছড়ি','রোয়াংছড়ি','রুমা','থানচি','লামা'],
+  'খাগড়াছড়ি':['খাগড়াছড়ি সদর','দিঘীনালা','লক্ষীছড়ি','মহালছড়ি','মানিকছড়ি','পানছড়ি','রামগড়','মাটিরাঙ্গা'],
+  'সিলেট':['সিলেট সদর','বালাগঞ্জ','বিয়ানীবাজার','গোলাপগঞ্জ','জকিগঞ্জ','কানাইঘাট','গোয়াইনঘাট'],
+  'সুনামগঞ্জ':['সুনামগঞ্জ সদর','ছাতক','দোয়ারাবাজার','দিরাই','শাল্লা','তাহিরপুর','জামালগঞ্জ'],
+  'রাজশাহী':['রাজশাহী সদর','পুঠিয়া','মোহনপুর','বাগমারা','দুর্গাপুর','তানোর','গোদাগাড়ী','চারঘাট'],
+  'খুলনা':['খুলনা সদর','দাকোপ','কয়রা','পাইকগাছা','বটিয়াঘাটা','রূপসা','দিঘলিয়া','ফুলতলা'],
+  'বরিশাল':['বরিশাল সদর','বানারীপাড়া','বাবুগঞ্জ','বাকেরগঞ্জ','হিজলা','মেহেন্দিগঞ্জ','গৌরনদী'],
+  'রংপুর':['রংপুর সদর','কাউনিয়া','গঙ্গাচড়া','মিঠাপুকুর','পীরগাছা','পীরগঞ্জ','বদরগঞ্জ'],
+  'ময়মনসিংহ':['ময়মনসিংহ সদর','ভালুকা','গফরগাঁও','ফুলবাড়িয়া','ত্রিশাল','হালুয়াঘাট','মুক্তাগাছা'],
+};
+const DISTRICT_NOTES = {
+  'কক্সবাজার':'সমুদ্র উপকূলীয় — লবণাক্ততা ও সাইক্লোন সুরক্ষা খরচ +৭%. বিশেষ Anti-corrosion রড ও পেইন্ট ব্যবহার করুন।',
+  'রাঙ্গামাটি':'পার্বত্য এলাকা — পরিবহন ও ফাউন্ডেশন খরচ +২০%. উপকরণ পৌঁছাতে অতিরিক্ত খরচ।',
+  'বান্দরবান':'পার্বত্য এলাকা — পরিবহন ও ফাউন্ডেশন খরচ +২০%.',
+  'খাগড়াছড়ি':'পার্বত্য এলাকা — পরিবহন খরচ +১৫%.',
+  'সুনামগঞ্জ':'হাওর এলাকা — বন্যা সুরক্ষা ও উঁচু ফাউন্ডেশন +১২%. বর্ষায় নির্মাণ বন্ধ রাখতে হয়।',
+  'সিলেট':'ভূমিকম্প জোন-৪ — অতিরিক্ত স্ট্রাকচারাল রিইনফোর্সমেন্ট প্রয়োজন।',
+  'ভোলা':'চর ও বন্যা এলাকা — ফাউন্ডেশন ও সুরক্ষা +১০%.',
+  'ঢাকা':'মেট্রো কোর — সর্বোচ্চ নির্মাণ ব্যয়। উপকরণ সহজলভ্য।',
 };
 
-const specialFeatures = {
-  '1.0':[{n:'অতিরিক্ত রুম',c:80000},{n:'পার্কিং স্পেস',c:120000},{n:'ছাদ বাগান',c:150000},{n:'সিসি ক্যামেরা',c:35000},{n:'ফায়ার এক্সটিংগুইশার',c:10000},{n:'ইন্টারনেট ক্যাবলিং',c:25000},{n:'LED লাইটিং',c:45000},{n:'ইন্টারকম',c:20000},{n:'হুইলচেয়ার র্যাম্প',c:30000},{n:'সুইমিং পুল',c:1500000},{n:'হোম থিয়েটার',c:500000},{n:'স্মার্ট হোম অটোমেশন',c:300000}],
-  '1.68':[{n:'আইসিইউ বেড (প্রতিটি)',c:500000},{n:'অ্যাম্বুলেন্স বে',c:200000},{n:'প্যাথলজি ল্যাব',c:1500000},{n:'অপারেশন থিয়েটার',c:3000000},{n:'অক্সিজেন লাইন',c:500000},{n:'ইমেজিং (এক্স-রে)',c:2000000},{n:'ফার্মেসি',c:300000},{n:'হুইলচেয়ার র্যাম্প',c:50000},{n:'এমার্জেন্সি জেনারেটর',c:500000},{n:'বায়ো-ওয়েস্ট ম্যানেজমেন্ট',c:400000},{n:'নার্স কলিং সিস্টেম',c:200000},{n:'নেগেটিভ প্রেসার রুম',c:800000}],
-  '1.40':[{n:'কমার্শিয়াল কিচেন',c:2000000},{n:'জিম ও স্পা',c:1500000},{n:'কনফারেন্স হল',c:1000000},{n:'রেস্তোরাঁ',c:1500000},{n:'লবি ডেকোরেশন',c:800000},{n:'লন্ড্রি সিস্টেম',c:500000},{n:'রুফটপ পুল',c:3000000},{n:'ভ্যালেট পার্কিং',c:200000},{n:'স্মার্ট রুম অটোমেশন',c:100000},{n:'সাউন্ডপ্রুফ রুম',c:50000},{n:'অডিও ভিজুয়াল',c:500000},{n:'স্যাটেলাইট টিভি',c:200000}],
-  '1.20':[{n:'লাইব্রেরি',c:500000},{n:'কম্পিউটার ল্যাব',c:1000000},{n:'সায়েন্স ল্যাব',c:800000},{n:'খেলার মাঠ',c:300000},{n:'স্মার্ট ক্লাসরুম',c:150000},{n:'অডিটোরিয়াম',c:2000000},{n:'সিসি ক্যামেরা',c:100000},{n:'শিক্ষক লাউঞ্জ',c:200000},{n:'স্কুল বাস বে',c:150000},{n:'ফায়ার অ্যালার্ম',c:80000},{n:'হুইলচেয়ার র্যাম্প',c:40000},{n:'স্মার্ট বোর্ড',c:80000}],
-  '1.10':[{n:'মিনার (ছোট)',c:200000},{n:'সাউন্ড সিস্টেম',c:150000},{n:'মিহরাব (মার্বেল)',c:300000},{n:'মিম্বার (কাঠ)',c:80000},{n:'ওজুর স্থান',c:200000},{n:'ইমাম কক্ষ',c:80000},{n:'মহিলা সেকশন',c:300000},{n:'পানি ফিল্টার',c:30000},{n:'কুরআন তাক',c:50000},{n:'সিসি ক্যামেরা',c:40000},{n:'ঈদগাহ মাঠ',c:200000},{n:'জেনারেটর ব্যাকআপ',c:150000}],
-  '1.05':[{n:'শ্রমিক ডর্মিটরি',c:1000000},{n:'ক্যান্টিন',c:500000},{n:'ডাস্ট কালেক্টর',c:800000},{n:'থ্রি-ফেজ সাবস্টেশন',c:2000000},{n:'ক্রেন ও হোয়েস্ট',c:1500000},{n:'লোডিং বে',c:500000},{n:'রাসায়নিক প্রতিরোধী মেঝে',c:300000},{n:'ভেন্টিলেশন সিস্টেম',c:600000},{n:'ফায়ার হাইড্র্যান্ট',c:200000},{n:'নিরাপত্তা গার্ড পোস্ট',c:80000},{n:'ETP বর্জ্য পরিশোধন',c:1500000},{n:'সোলার রুফটপ',c:500000}],
-};
-
-const checklist = {
-  'ফাউন্ডেশন':[{t:'মাটি পরীক্ষা (Soil Test)'},{t:'লেআউট মার্কিং'},{t:'খনন ও এক্সক্যাভেশন'},{t:'পাইলিং (প্রযোজ্য হলে)'},{t:'ফুটিং ও কলাম বেস ঢালাই'},{t:'ফাউন্ডেশন ওয়াটারপ্রুফিং'}],
-  'কলাম ও বিম':[{t:'রড বাইন্ডিং চেক'},{t:'ফর্মওয়ার্ক পরিদর্শন'},{t:'কংক্রিট মিক্স টেস্ট'},{t:'কলাম ঢালাই'},{t:'বিম ঢালাই'},{t:'কিউরিং (কমপক্ষে ৭ দিন)'}],
-  'স্ল্যাব':[{t:'স্ল্যাব রড বাইন্ডিং'},{t:'ইলেকট্রিক/পানির পাইপ বসানো'},{t:'স্ল্যাব ঢালাই'},{t:'লেভেলিং ও ফিনিশিং'},{t:'স্ল্যাব লোড টেস্ট (প্রয়োজনে)'},{t:'ওয়াটারপ্রুফিং (ছাদের জন্য)'}],
-  'প্লাস্টার ও ইট':[{t:'ইটের কাজ পরিদর্শন'},{t:'ভিতরের প্লাস্টার'},{t:'বাইরের প্লাস্টার'},{t:'সিলিং প্লাস্টার'},{t:'দরজা-জানালা ফ্রেম বসানো'},{t:'প্লাস্টার লেভেলিং চেক'}],
-  'ইলেকট্রিক্যাল':[{t:'তার ক্যাবলিং চেক'},{t:'সুইচ বোর্ড ইনস্টলেশন'},{t:'আর্থিং সংযোগ'},{t:'লাইটিং ফিক্সচার'},{t:'ইলেকট্রিক লোড টেস্ট'},{t:'ফায়ার অ্যালার্ম (প্রযোজ্য)'}],
-  'প্লাম্বিং':[{t:'পানির পাইপ লিকেজ চেক'},{t:'স্যানিটারি ফিটিং'},{t:'বাথরুম ওয়াটারপ্রুফিং'},{t:'ওভারহেড ট্যাংক সংযোগ'},{t:'পয়ঃনিষ্কাশন পরীক্ষা'},{t:'গ্যাস লাইন চেক (প্রযোজ্য)'}],
-  'ফিনিশিং':[{t:'টাইলস বসানো পরিদর্শন'},{t:'পেইন্টিং গুণমান চেক'},{t:'দরজা-জানালা পরিষ্কার'},{t:'গ্রিল ও হ্যান্ডরেইল'},{t:'সাইট পরিষ্কার'},{t:'চূড়ান্ত হস্তান্তর পরিদর্শন'}],
-};
-
-// State
-let currency = 'BDT';
-const rates = {BDT:1, USD:0.0091, INR:0.76};
-const sym = {BDT:'৳', USD:'$', INR:'₹'};
-function fmt(n) {
-  const v = n * rates[currency];
-  const s = sym[currency];
-  if(currency==='BDT') return s+' '+Math.round(v).toLocaleString();
-  return s+' '+v.toFixed(2);
-}
-
-let laborData = [
-  {name:'হেড মিস্ত্রি',count:2,wage:1200,days:120},
-  {name:'রড বাইন্ডার',count:4,wage:900,days:90},
-  {name:'ইলেকট্রিশিয়ান',count:2,wage:1000,days:45},
-  {name:'প্লাম্বার',count:2,wage:950,days:40},
-  {name:'পেইন্টার',count:3,wage:800,days:30},
-  {name:'হেল্পার',count:6,wage:600,days:120},
+// BUILDING TYPES
+const BUILDING_TYPES = [
+  {cat:'residential',label:'একক আবাসিক বাড়ি',val:'res_single',factor:1.0},
+  {cat:'residential',label:'দোতলা বাড়ি',val:'res_double',factor:1.05},
+  {cat:'residential',label:'অ্যাপার্টমেন্ট বহুতল',val:'apt',factor:1.15},
+  {cat:'residential',label:'ভিলা (হাই-এন্ড)',val:'villa',factor:1.32},
+  {cat:'residential',label:'ডর্মিটরি / হোস্টেল',val:'dorm',factor:0.92},
+  {cat:'residential',label:'কর্মচারী আবাসন',val:'staff_qtr',factor:0.88},
+  {cat:'commercial',label:'অফিস বিল্ডিং',val:'office',factor:1.25},
+  {cat:'commercial',label:'শোরুম',val:'showroom',factor:1.28},
+  {cat:'commercial',label:'ব্যাংক শাখা',val:'bank',factor:1.38},
+  {cat:'commercial',label:'শপিং মল / মার্কেট',val:'mall',factor:1.42},
+  {cat:'commercial',label:'পেট্রোল পাম্প',val:'petrol',factor:0.98},
+  {cat:'commercial',label:'সুপারশপ / রিটেইল',val:'retail',factor:1.20},
+  {cat:'health',label:'হাসপাতাল (জেনারেল)',val:'hospital',factor:1.68},
+  {cat:'health',label:'ক্লিনিক / ডায়াগনস্টিক',val:'clinic',factor:1.45},
+  {cat:'health',label:'ফার্মাসিউটিক্যালস প্ল্যান্ট',val:'pharma',factor:1.55},
+  {cat:'health',label:'মেডিকেল কলেজ',val:'med_college',factor:1.60},
+  {cat:'education',label:'প্রাথমিক বিদ্যালয়',val:'primary_school',factor:1.10},
+  {cat:'education',label:'মাধ্যমিক স্কুল',val:'school',factor:1.18},
+  {cat:'education',label:'কলেজ',val:'college',factor:1.28},
+  {cat:'education',label:'বিশ্ববিদ্যালয়',val:'university',factor:1.35},
+  {cat:'education',label:'মাদ্রাসা',val:'madrasa',factor:1.05},
+  {cat:'education',label:'কিন্ডারগার্টেন',val:'kg',factor:1.08},
+  {cat:'hospitality',label:'হোটেল ★★★',val:'hotel3',factor:1.40},
+  {cat:'hospitality',label:'হোটেল ★★★★★',val:'hotel5',factor:1.72},
+  {cat:'hospitality',label:'বাজেট হোটেল / মেস',val:'budget_hotel',factor:0.95},
+  {cat:'hospitality',label:'রিসোর্ট',val:'resort',factor:1.58},
+  {cat:'hospitality',label:'কমিউনিটি সেন্টার',val:'community',factor:1.10},
+  {cat:'hospitality',label:'কনভেনশন হল / ব্যাংকুয়েট',val:'convention',factor:1.25},
+  {cat:'religious',label:'মসজিদ',val:'mosque',factor:1.12},
+  {cat:'religious',label:'মন্দির',val:'temple',factor:1.08},
+  {cat:'religious',label:'গির্জা',val:'church',factor:1.10},
+  {cat:'religious',label:'ঈদগাহ মাঠ',val:'eidgah',factor:0.75},
+  {cat:'industrial',label:'শিল্প কারখানা',val:'factory',factor:1.05},
+  {cat:'industrial',label:'গার্মেন্টস ফ্যাক্টরি',val:'garments',factor:1.15},
+  {cat:'industrial',label:'ফুড প্রসেসিং',val:'food_proc',factor:1.38},
+  {cat:'industrial',label:'গোডাউন / ওয়্যারহাউস',val:'warehouse',factor:0.92},
+  {cat:'industrial',label:'কোল্ড স্টোরেজ',val:'cold',factor:1.20},
+  {cat:'govt',label:'সরকারি অফিস',val:'govt_office',factor:1.18},
+  {cat:'govt',label:'পুলিশ স্টেশন',val:'police',factor:1.12},
+  {cat:'govt',label:'কোর্টহাউস',val:'courthouse',factor:1.22},
+  {cat:'transport',label:'বাস টার্মিনাল',val:'bus_terminal',factor:1.05},
+  {cat:'transport',label:'মাল্টিলেভেল পার্কিং',val:'parking',factor:1.08},
+  {cat:'recreation',label:'স্টেডিয়াম',val:'stadium',factor:1.32},
+  {cat:'recreation',label:'অডিটোরিয়াম',val:'auditorium',factor:1.28},
+  {cat:'recreation',label:'সিনেমা হল',val:'cinema',factor:1.22},
+  {cat:'agri',label:'কৃষি গুদাম / Silo',val:'agri_store',factor:0.82},
+  {cat:'agri',label:'পোল্ট্রি ফার্ম',val:'poultry',factor:0.78},
 ];
-let milestones = [
-  {name:'অগ্রিম (মোবিলাইজেশন)',pct:20,date:'',status:'pending'},
-  {name:'ফাউন্ডেশন সম্পন্ন',pct:25,date:'',status:'pending'},
-  {name:'কাঠামো সম্পন্ন',pct:25,date:'',status:'pending'},
-  {name:'প্লাস্টার ও ইলেকট্রিক',pct:20,date:'',status:'pending'},
-  {name:'চূড়ান্ত হস্তান্তর',pct:10,date:'',status:'pending'},
+
+// SPECIAL FEATURES — 50+ per type
+const SF = {
+  res_single:[
+    {n:'পার্কিং শেড (গাড়ি)',c:80000,u:'টি',q:1},{n:'ছাদ বাগান',c:150000,u:'',q:1},
+    {n:'সুইমিং পুল (ব্যক্তিগত)',c:1500000,u:'',q:1},{n:'হোম থিয়েটার রুম',c:500000,u:'',q:1},
+    {n:'মডুলার কিচেন (প্রিমিয়াম)',c:500000,u:'',q:1},{n:'বিল্ট-ইন ওয়ার্ডরোব',c:30000,u:'টি',q:4},
+    {n:'জ্যাকুজি / বাথটাব',c:200000,u:'',q:1},{n:'স্টাডি রুম লাইব্রেরি',c:150000,u:'',q:1},
+    {n:'হোম অফিস সেটআপ',c:200000,u:'',q:1},{n:'পূজা / প্রার্থনা কক্ষ',c:100000,u:'',q:1},
+    {n:'গেস্ট রুম (বাড়তি)',c:120000,u:'টি',q:1},{n:'ড্রেসিং রুম',c:100000,u:'',q:1},
+    {n:'ওয়াক-ইন ক্লসেট',c:200000,u:'',q:1},{n:'আন্ডারগ্রাউন্ড ওয়াটার রিজার্ভার',c:120000,u:'',q:1},
+    {n:'সোলার ওয়াটার হিটার',c:50000,u:'',q:1},{n:'রেইনওয়াটার হার্ভেস্টিং',c:80000,u:'',q:1},
+    {n:'হোম গার্ডেন ইরিগেশন',c:60000,u:'',q:1},{n:'বারবিকিউ / আউটডোর গ্রিল',c:80000,u:'',q:1},
+    {n:'ফায়ারপ্লেস',c:300000,u:'',q:1},{n:'ডাবল গ্লেজড উইন্ডো',c:800,u:'sqft',q:200},
+    {n:'স্মার্ট লক সব দরজায়',c:20000,u:'দরজা',q:5},{n:'হোম অটোমেশন (পূর্ণ)',c:500000,u:'',q:1},
+    {n:'EV চার্জিং পয়েন্ট',c:60000,u:'টি',q:1},{n:'সাইকেল স্টোরেজ',c:30000,u:'',q:1},
+    {n:'ব্যালকনি গ্লাস রেলিং',c:600,u:'ফুট',q:50},{n:'ইন্টেরিয়র ফলস সিলিং',c:350,u:'sqft',q:500},
+    {n:'পলিশড কংক্রিট ফ্লোর',c:400,u:'sqft',q:500},{n:'মার্বেল ফ্লোর (ইম্পোর্টেড)',c:900,u:'sqft',q:500},
+    {n:'বাথরুম গ্রানাইট কাউন্টার',c:50000,u:'বাথ',q:3},{n:'কিচেন আইল্যান্ড',c:120000,u:'',q:1},
+    {n:'ওয়াইন সেলার',c:200000,u:'',q:1},{n:'প্যানিক রুম',c:500000,u:'',q:1},
+    {n:'বেসমেন্ট পার্কিং',c:800000,u:'',q:1},{n:'রুফটপ সোলার সিস্টেম',c:80000,u:'kW',q:5},
+    {n:'আউটডোর লাইটিং (ডেকোরেটিভ)',c:80000,u:'',q:1},{n:'সাউন্ডপ্রুফ বেডরুম',c:60000,u:'রুম',q:1},
+    {n:'এয়ার পিউরিফায়ার সিস্টেম',c:80000,u:'',q:1},{n:'সেন্ট্রাল ভ্যাকুয়াম',c:120000,u:'',q:1},
+    {n:'পুল হাউস',c:300000,u:'',q:1},{n:'বোটহাউস',c:500000,u:'',q:1},
+    {n:'হেলিপ্যাড',c:3000000,u:'',q:1},{n:'প্রাইভেট লিফট',c:3000000,u:'',q:1},
+    {n:'গ্রীনহাউস / নার্সারি',c:200000,u:'',q:1},{n:'আর্ট স্টুডিও',c:200000,u:'',q:1},
+    {n:'ইন্ডোর প্ল্যান্ট ওয়াল',c:100000,u:'',q:1},{n:'পেট রুম',c:80000,u:'',q:1},
+    {n:'মিউজিক স্টুডিও',c:500000,u:'',q:1},{n:'গেম রুম (বিলিয়ার্ড/পিং-পং)',c:300000,u:'',q:1},
+    {n:'ব্যক্তিগত জিম',c:400000,u:'',q:1},{n:'সওনা / স্টিম রুম',c:350000,u:'',q:1},
+  ],
+  apt:[
+    {n:'রুফটপ কমন স্পেস',c:300000,u:'',q:1},{n:'গেটেড সিকিউরিটি সিস্টেম',c:200000,u:'',q:1},
+    {n:'ইন্টারকম প্রতি ফ্লোর',c:15000,u:'ফ্লোর',q:5},{n:'ফায়ার স্প্রিংকলার',c:50000,u:'ফ্লোর',q:5},
+    {n:'সাবমার্সিবল পাম্প',c:60000,u:'টি',q:2},{n:'জেনারেটর রুম',c:200000,u:'',q:1},
+    {n:'কমন লন্ড্রি রুম',c:120000,u:'',q:1},{n:'চিলড্রেন প্লে জোন',c:250000,u:'',q:1},
+    {n:'রেসিডেন্ট অ্যাপ সিস্টেম',c:80000,u:'',q:1},{n:'কমন লবি ডেকোরেশন',c:400000,u:'',q:1},
+    {n:'ফায়ার এক্সিট স্টেয়ার',c:300000,u:'',q:1},{n:'গার্বেজ শুট',c:100000,u:'',q:1},
+    {n:'সাইকেল পার্কিং',c:50000,u:'',q:1},{n:'EV চার্জিং পয়েন্ট',c:60000,u:'টি',q:3},
+    {n:'বাসিন্দা কমন রুম',c:300000,u:'',q:1},{n:'বিল্ডিং ম্যানেজার রুম',c:100000,u:'',q:1},
+    {n:'মেইলবক্স সিস্টেম',c:50000,u:'',q:1},{n:'ডিজিটাল বিলবোর্ড',c:80000,u:'',q:1},
+    {n:'রুফটপ সোলার',c:80000,u:'kW',q:10},{n:'রেইনওয়াটার হার্ভেস্টিং',c:150000,u:'',q:1},
+    {n:'সুইমিং পুল (কমন)',c:2500000,u:'',q:1},{n:'ফিটনেস সেন্টার',c:600000,u:'',q:1},
+    {n:'যোগ / মেডিটেশন রুম',c:150000,u:'',q:1},{n:'মিনি মার্কেট',c:300000,u:'',q:1},
+    {n:'পোষা প্রাণী এলাকা',c:100000,u:'',q:1},{n:'বিবিকিউ টেরেস',c:200000,u:'',q:1},
+    {n:'স্কাই লাউঞ্জ (ছাদে)',c:500000,u:'',q:1},{n:'স্মার্ট পার্কিং সিস্টেম',c:300000,u:'',q:1},
+    {n:'ভিজিটর পার্কিং',c:100000,u:'',q:1},{n:'প্যাকেজ ডেলিভারি লকার',c:150000,u:'',q:1},
+    {n:'পানির সফটেনার',c:80000,u:'',q:1},{n:'ওভারহেড ট্যাংক (বড়)',c:120000,u:'',q:1},
+    {n:'আন্ডারগ্রাউন্ড সিস্টার্ন',c:200000,u:'',q:1},{n:'প্রতি ফ্লোরে পানির মিটার',c:8000,u:'ফ্লোর',q:5},
+    {n:'ভূমিকম্প সেন্সর',c:100000,u:'',q:1},{n:'লাইটনিং অ্যারেস্টার',c:50000,u:'',q:1},
+    {n:'ছাদে হেলিপ্যাড',c:3000000,u:'',q:1},{n:'কমন ওয়াশরুম (প্রতি ফ্লোর)',c:80000,u:'ফ্লোর',q:5},
+    {n:'বিল্ডিং ফ্যাসাড লাইটিং',c:300000,u:'',q:1},{n:'এন্ট্রান্স ক্যানোপি',c:200000,u:'',q:1},
+    {n:'কনফারেন্স রুম (কমন)',c:300000,u:'',q:1},{n:'কো-ওয়ার্কিং স্পেস',c:400000,u:'',q:1},
+    {n:'টেরেস গার্ডেন (প্রতি ফ্লোর)',c:100000,u:'ফ্লোর',q:2},{n:'গ্রীন ওয়াল',c:200000,u:'',q:1},
+    {n:'পোষ্টাল হাব',c:50000,u:'',q:1},{n:'কমন ডাইনিং স্পেস',c:300000,u:'',q:1},
+    {n:'লাইব্রেরি কর্নার',c:100000,u:'',q:1},{n:'ডে কেয়ার',c:300000,u:'',q:1},
+    {n:'প্রবাসী কমিউনিটি হল',c:400000,u:'',q:1},{n:'অতিথি স্যুট',c:500000,u:'',q:1},
+  ],
+  hospital:[
+    {n:'আইসিইউ বেড সেটআপ',c:500000,u:'বেড',q:5},{n:'অ্যাম্বুলেন্স বে',c:250000,u:'',q:1},
+    {n:'প্যাথলজি ল্যাব (ফুল)',c:1500000,u:'',q:1},{n:'অপারেশন থিয়েটার',c:3500000,u:'টি',q:2},
+    {n:'অক্সিজেন পাইপলাইন',c:700000,u:'',q:1},{n:'X-Ray / CT Scan রুম',c:2500000,u:'',q:1},
+    {n:'MRI রুম (শিল্ডিং)',c:5000000,u:'',q:1},{n:'ইন্টারনাল ফার্মেসি',c:400000,u:'',q:1},
+    {n:'হুইলচেয়ার র‍্যাম্প',c:100000,u:'',q:1},{n:'ইমার্জেন্সি জেনারেটর',c:1000000,u:'',q:1},
+    {n:'বায়ো-ওয়েস্ট ম্যানেজমেন্ট',c:600000,u:'',q:1},{n:'নার্স কলিং সিস্টেম',c:300000,u:'',q:1},
+    {n:'নেগেটিভ প্রেসার রুম',c:1000000,u:'টি',q:2},{n:'CSSD স্টেরিলাইজেশন',c:1500000,u:'',q:1},
+    {n:'NICU (নবজাতক ICU)',c:2500000,u:'',q:1},{n:'ব্লাড ব্যাংক',c:1000000,u:'',q:1},
+    {n:'এন্ডোস্কপি রুম',c:1800000,u:'',q:1},{n:'ডায়ালাইসিস সেন্টার',c:3000000,u:'',q:1},
+    {n:'কার্ডিয়াক ক্যাথ ল্যাব',c:5000000,u:'',q:1},{n:'HIS সফটওয়্যার',c:600000,u:'',q:1},
+    {n:'লন্ড্রি ও লিনেন',c:400000,u:'',q:1},{n:'ক্যান্টিন / ক্যাফেটেরিয়া',c:600000,u:'',q:1},
+    {n:'ডাক্তার রেস্ট রুম',c:200000,u:'',q:2},{n:'পেশেন্ট লাউঞ্জ',c:300000,u:'',q:1},
+    {n:'ভিজিটর ওয়েটিং এরিয়া',c:250000,u:'',q:1},{n:'চ্যাপেল / প্রার্থনা কক্ষ',c:150000,u:'',q:1},
+    {n:'হাসপাতাল অ্যাপ',c:300000,u:'',q:1},{n:'টেলিমেডিসিন বুথ',c:200000,u:'টি',q:2},
+    {n:'পানির বিশুদ্ধকরণ (RO)',c:300000,u:'',q:1},{n:'অক্সিজেন জেনারেটর প্ল্যান্ট',c:2000000,u:'',q:1},
+    {n:'মেডিকেল গ্যাস সিস্টেম',c:800000,u:'',q:1},{n:'বিশেষ বিদ্যুৎ সাবস্টেশন',c:2000000,u:'',q:1},
+    {n:'কোয়ারেন্টাইন ওয়ার্ড',c:1000000,u:'',q:1},{n:'শিশু ওয়ার্ড (রঙিন)',c:500000,u:'',q:1},
+    {n:'VIP কেবিন',c:800000,u:'টি',q:3},{n:'রোবোটিক সার্জারি রুম',c:10000000,u:'',q:1},
+    {n:'নিউক্লিয়ার মেডিসিন',c:8000000,u:'',q:1},{n:'হেলিপ্যাড (ছাদে)',c:3000000,u:'',q:1},
+    {n:'পার্কিং (মাল্টিলেভেল)',c:2000000,u:'',q:1},{n:'মর্গ ও ময়নাতদন্ত কক্ষ',c:500000,u:'',q:1},
+    {n:'ফার্মেসি স্টোর',c:300000,u:'',q:1},{n:'মেডিকেল ওয়েস্ট ইনসিনারেটর',c:1500000,u:'',q:1},
+    {n:'হাসপাতাল সাইনেজ',c:200000,u:'',q:1},{n:'পেশেন্ট পোর্টাল সিস্টেম',c:400000,u:'',q:1},
+    {n:'পিএ/ইন্টারকম সিস্টেম',c:300000,u:'',q:1},{n:'হ্যান্ড হাইজিন স্টেশন',c:5000,u:'টি',q:20},
+    {n:'মেডিকেল গ্রেড ফ্লোরিং',c:500,u:'sqft',q:3000},{n:'আলাদা ভেন্টিলেশন (ICU)',c:1000000,u:'',q:1},
+  ],
+  hotel3:[
+    {n:'কমার্শিয়াল কিচেন',c:2500000,u:'',q:1},{n:'জিম ও স্পা',c:2000000,u:'',q:1},
+    {n:'কনফারেন্স হল',c:1200000,u:'টি',q:2},{n:'রেস্তোরাঁ (ফুল)',c:2000000,u:'',q:1},
+    {n:'লবি ডেকোরেশন',c:1500000,u:'',q:1},{n:'লন্ড্রি সিস্টেম',c:800000,u:'',q:1},
+    {n:'রুফটপ পুল',c:4000000,u:'',q:1},{n:'ভ্যালেট পার্কিং',c:300000,u:'',q:1},
+    {n:'স্মার্ট রুম (প্রতি রুম)',c:120000,u:'রুম',q:30},{n:'সাউন্ডপ্রুফ রুম',c:70000,u:'রুম',q:5},
+    {n:'AV ইভেন্ট রুম',c:1000000,u:'',q:1},{n:'স্যাটেলাইট টিভি সিস্টেম',c:300000,u:'',q:1},
+    {n:'রুম সার্ভিস লিফট',c:400000,u:'টি',q:2},{n:'PMS সফটওয়্যার',c:250000,u:'',q:1},
+    {n:'বার / লাউঞ্জ',c:1200000,u:'',q:1},{n:'বিজনেস সেন্টার',c:500000,u:'',q:1},
+    {n:'কিডস ক্লাব',c:400000,u:'',q:1},{n:'EV চার্জিং',c:60000,u:'টি',q:10},
+    {n:'হেলিপ্যাড',c:4000000,u:'',q:1},{n:'শেফস টেবল',c:600000,u:'',q:1},
+    {n:'রুম কী কার্ড সিস্টেম',c:15000,u:'রুম',q:50},{n:'মিনিবার সিস্টেম',c:20000,u:'রুম',q:30},
+    {n:'বাথরোব ও আমেনিটি',c:15000,u:'রুম',q:30},{n:'এক্সক্লুসিভ ক্লাব ফ্লোর',c:1500000,u:'',q:1},
+    {n:'বাটলার সার্ভিস রুম',c:200000,u:'',q:1},{n:'ইন্ডোর গার্ডেন',c:500000,u:'',q:1},
+    {n:'আর্ট গ্যালারি',c:400000,u:'',q:1},{n:'ওয়েলনেস সেন্টার',c:2000000,u:'',q:1},
+    {n:'আউটডোর ওয়েডিং গার্ডেন',c:1000000,u:'',q:1},{n:'বোট ডক (রিভারসাইড)',c:2000000,u:'',q:1},
+    {n:'প্রাইভেট ডাইনিং রুম',c:800000,u:'',q:1},{n:'ওয়াইন সেলার',c:500000,u:'',q:1},
+    {n:'আইস মেশিন ও কোল্ড রুম',c:400000,u:'',q:1},{n:'ব্যাকস্টেজ প্রপার্টি সিস্টেম',c:200000,u:'',q:1},
+    {n:'হোটেল অ্যাপ',c:300000,u:'',q:1},{n:'QR কোড রুম সার্ভিস',c:100000,u:'',q:1},
+    {n:'ভার্চুয়াল কনসিয়ার্জ',c:200000,u:'',q:1},{n:'রুম ফ্রেশনার সিস্টেম',c:8000,u:'রুম',q:30},
+    {n:'ব্ল্যাকআউট কার্টেন সিস্টেম',c:15000,u:'রুম',q:30},{n:'সিলিং ফ্যান (ডিজাইনার)',c:25000,u:'রুম',q:30},
+    {n:'মেডিটেশন রুম',c:200000,u:'',q:1},{n:'বিচ এক্সেস (কক্সবাজার)',c:1000000,u:'',q:1},
+    {n:'টেনিস কোর্ট',c:1500000,u:'',q:1},{n:'গলফ সিমুলেটর',c:2000000,u:'',q:1},
+    {n:'কিচেন গার্ডেন (অর্গানিক)',c:200000,u:'',q:1},{n:'হর্স রাইডিং ট্র্যাক',c:3000000,u:'',q:1},
+    {n:'ইনফিনিটি পুল (এক্সটেরিয়র)',c:6000000,u:'',q:1},{n:'লাক্সারি টেন্ট সুইট',c:1500000,u:'টি',q:3},
+  ],
+  school:[
+    {n:'লাইব্রেরি (ফুল সেটআপ)',c:700000,u:'',q:1},{n:'কম্পিউটার ল্যাব',c:1200000,u:'',q:1},
+    {n:'সায়েন্স ল্যাব',c:1000000,u:'',q:1},{n:'খেলার মাঠ সেটআপ',c:500000,u:'',q:1},
+    {n:'স্মার্ট ক্লাসরুম',c:180000,u:'টি',q:5},{n:'অডিটোরিয়াম',c:2500000,u:'',q:1},
+    {n:'ক্যান্টিন / টিফিন রুম',c:400000,u:'',q:1},{n:'পানির ফিল্টার সিস্টেম',c:100000,u:'',q:1},
+    {n:'স্বাস্থ্য কক্ষ',c:150000,u:'',q:1},{n:'আর্ট / ক্রাফট রুম',c:250000,u:'',q:1},
+    {n:'মিউজিক রুম',c:300000,u:'',q:1},{n:'ইনডোর গেমস রুম',c:250000,u:'',q:1},
+    {n:'স্মার্ট বোর্ড',c:100000,u:'টি',q:10},{n:'CCTV সিস্টেম',c:150000,u:'',q:1},
+    {n:'শিক্ষক লাউঞ্জ',c:250000,u:'',q:1},{n:'স্কুল বাস বে',c:200000,u:'',q:1},
+    {n:'ফায়ার অ্যালার্ম সিস্টেম',c:120000,u:'',q:1},{n:'প্যারেন্টস ওয়েটিং',c:200000,u:'',q:1},
+    {n:'স্কুল ম্যানেজমেন্ট সিস্টেম',c:150000,u:'',q:1},{n:'এলইডি ডিসপ্লে বোর্ড',c:150000,u:'',q:1},
+    {n:'রোবোটিক্স ল্যাব',c:800000,u:'',q:1},{n:'3D প্রিন্টার রুম',c:400000,u:'',q:1},
+    {n:'ড্রোন ল্যাব',c:500000,u:'',q:1},{n:'আইসিটি হাব',c:600000,u:'',q:1},
+    {n:'গার্ল্স কমন রুম',c:150000,u:'',q:1},{n:'বয়েজ কমন রুম',c:150000,u:'',q:1},
+    {n:'কাউন্সেলিং রুম',c:100000,u:'',q:1},{n:'পিটিএ হল',c:300000,u:'',q:1},
+    {n:'সোলার প্যানেল',c:80000,u:'kW',q:15},{n:'রেইনওয়াটার হার্ভেস্টিং',c:150000,u:'',q:1},
+    {n:'গ্রীন হাউস / নার্সারি',c:150000,u:'',q:1},{n:'অর্গানিক গার্ডেন',c:100000,u:'',q:1},
+    {n:'সাইকেল পার্কিং',c:50000,u:'',q:1},{n:'ওয়াশরুম (প্রতিবন্ধী)',c:80000,u:'',q:1},
+    {n:'অ্যাক্সেসিবল র‍্যাম্প',c:60000,u:'',q:1},{n:'ফার্স্ট এইড কিয়স্ক',c:50000,u:'',q:1},
+    {n:'শিক্ষার্থী ডাটাবেস সিস্টেম',c:200000,u:'',q:1},{n:'অনলাইন ক্লাস স্টুডিও',c:400000,u:'',q:1},
+    {n:'পোশাক স্টোর',c:100000,u:'',q:1},{n:'প্রধান শিক্ষক চেম্বার',c:150000,u:'',q:1},
+    {n:'সহশিক্ষা কার্যক্রম হল',c:300000,u:'',q:1},{n:'বাস্কেটবল কোর্ট',c:300000,u:'',q:1},
+    {n:'ভলিবল কোর্ট',c:200000,u:'',q:1},{n:'আর্কেরি রেঞ্জ',c:400000,u:'',q:1},
+    {n:'ইনডোর বাস্কেটবল হল',c:2000000,u:'',q:1},{n:'সুইমিং পুল (স্কুল)',c:3000000,u:'',q:1},
+    {n:'রানিং ট্র্যাক',c:1000000,u:'',q:1},{n:'ক্লাইম্বিং ওয়াল',c:300000,u:'',q:1},
+  ],
+  mosque:[
+    {n:'মিনার (জোড়া, মাঝারি)',c:350000,u:'জোড়া',q:1},{n:'মিনার (উঁচু ৬০+ ফুট)',c:700000,u:'টি',q:1},
+    {n:'গম্বুজ (স্টিল+টাইলস)',c:800000,u:'টি',q:1},{n:'কাচের গম্বুজ',c:1200000,u:'',q:1},
+    {n:'সাউন্ড সিস্টেম (হাই কোয়ালিটি)',c:250000,u:'',q:1},{n:'মিহরাব (মার্বেল/গ্রানাইট)',c:500000,u:'',q:1},
+    {n:'মিম্বার (সেগুন কাঠ)',c:150000,u:'',q:1},{n:'ওজুর স্থান (পূর্ণাঙ্গ)',c:300000,u:'',q:1},
+    {n:'ইমাম কক্ষ',c:100000,u:'',q:1},{n:'মুয়াজ্জিন কক্ষ',c:80000,u:'',q:1},
+    {n:'মহিলা সেকশন (আলাদা)',c:400000,u:'',q:1},{n:'পানির ফিল্টার',c:50000,u:'',q:1},
+    {n:'কুরআন তাক / রেহেল',c:80000,u:'',q:1},{n:'কার্পেট (উচ্চমানের)',c:600,u:'sqft',q:2000},
+    {n:'ডিজিটাল সময় ডিসপ্লে',c:40000,u:'',q:1},{n:'জুতার তাক ও শেড',c:100000,u:'',q:1},
+    {n:'ইসলামিক ক্যালিগ্রাফি',c:200000,u:'',q:1},{n:'মসজিদ লাইব্রেরি',c:150000,u:'',q:1},
+    {n:'মাদ্রাসা কক্ষ',c:200000,u:'টি',q:3},{n:'ঈদগাহ মাঠ সংযুক্ত',c:300000,u:'',q:1},
+    {n:'কিবলা ইন্ডিকেটর (স্মার্ট)',c:30000,u:'',q:1},{n:'জেনারেটর ব্যাকআপ',c:200000,u:'',q:1},
+    {n:'বিদ্যুৎ সাশ্রয়ী AC',c:70000,u:'টি',q:5},{n:'রেইনওয়াটার ওজুর জন্য',c:100000,u:'',q:1},
+    {n:'হজ তথ্যকেন্দ্র',c:80000,u:'',q:1},{n:'ইসলামিক শিক্ষাকেন্দ্র',c:300000,u:'',q:1},
+    {n:'মসজিদ অ্যাপ',c:50000,u:'',q:1},{n:'অনলাইন জুমা স্ট্রিমিং',c:80000,u:'',q:1},
+    {n:'শীতাতপ নিয়ন্ত্রণ (সেন্ট্রাল)',c:150000,u:'টন',q:5},{n:'প্রবেশ গেট (অটোমেটিক)',c:200000,u:'',q:1},
+    {n:'মসজিদ সিসি ক্যামেরা',c:60000,u:'',q:1},{n:'অনাথ শিশু কক্ষ',c:150000,u:'',q:1},
+    {n:'মরহুমদের জন্য গোসলখানা',c:200000,u:'',q:1},{n:'লাইব্রেরি তাক (ওয়াকফ)',c:100000,u:'',q:1},
+    {n:'মহিলা ওজু (আলাদা)',c:150000,u:'',q:1},{n:'অটো ওজু নজল',c:5000,u:'টি',q:10},
+    {n:'আরবি ক্লাস রুম',c:150000,u:'',q:1},{n:'কোরআন হিফজ রুম',c:200000,u:'',q:1},
+    {n:'দাওয়াহ সেন্টার',c:200000,u:'',q:1},{n:'মসজিদ বিউটিফিকেশন',c:500000,u:'',q:1},
+    {n:'ইসলামিক আর্ট মিউরাল',c:300000,u:'',q:1},{n:'মিরর মোজাইক টাইলস',c:800,u:'sqft',q:500},
+    {n:'ইস্তিঞ্জাখানা (উচ্চমান)',c:200000,u:'',q:1},{n:'শিশু সুন্নতে খতনা রুম',c:80000,u:'',q:1},
+    {n:'ক্যান্টিন (ইফতার মাহফিল)',c:300000,u:'',q:1},{n:'গ্রন্থাগার এ/সি',c:40000,u:'টি',q:2},
+    {n:'ছাদ থেকে লাউডস্পিকার',c:50000,u:'টি',q:4},{n:'মসজিদ উন্নয়ন ফান্ড ব্যবস্থা',c:30000,u:'',q:1},
+  ],
+  factory:[
+    {n:'শ্রমিক ডর্মিটরি',c:1200000,u:'',q:1},{n:'ক্যান্টিন (শিল্প মানের)',c:800000,u:'',q:1},
+    {n:'ডাস্ট কালেক্টর সিস্টেম',c:1200000,u:'',q:1},{n:'থ্রি-ফেজ সাবস্টেশন',c:3000000,u:'',q:1},
+    {n:'ওভারহেড ক্রেন (৫ টন)',c:2500000,u:'',q:1},{n:'লোডিং ডক',c:700000,u:'টি',q:2},
+    {n:'রাসায়নিক প্রতিরোধী ফ্লোরিং',c:500,u:'sqft',q:5000},{n:'ইন্ডাস্ট্রিয়াল ভেন্টিলেশন',c:1000000,u:'',q:1},
+    {n:'ফায়ার হাইড্র্যান্ট সিস্টেম',c:400000,u:'',q:1},{n:'নিরাপত্তা গার্ড পোস্ট',c:120000,u:'টি',q:3},
+    {n:'ETP (বর্জ্য পরিশোধন)',c:2500000,u:'',q:1},{n:'রুফটপ সোলার',c:80000,u:'kW',q:50},
+    {n:'কম্প্রেসড এয়ার লাইন',c:400000,u:'',q:1},{n:'কোয়ালিটি কন্ট্রোল ল্যাব',c:1000000,u:'',q:1},
+    {n:'মেশিন ফাউন্ডেশন (বিশেষ)',c:600000,u:'',q:1},{n:'ট্রান্সফর্মার রুম',c:500000,u:'',q:1},
+    {n:'EMS সিস্টেম',c:300000,u:'',q:1},{n:'CCTV + অ্যাক্সেস কন্ট্রোল',c:300000,u:'',q:1},
+    {n:'চেঞ্জিং রুম + লকার',c:250000,u:'',q:1},{n:'ওজন কাঁটা (Weighbridge)',c:2000000,u:'',q:1},
+    {n:'ফোর্কলিফট চার্জিং',c:150000,u:'টি',q:2},{n:'ইনডাস্ট্রিয়াল স্কেল',c:200000,u:'',q:1},
+    {n:'স্পেয়ার পার্টস স্টোর',c:200000,u:'',q:1},{n:'ওয়ার্কশপ এরিয়া',c:300000,u:'',q:1},
+    {n:'পরীক্ষাগার (প্রাইমারি)',c:500000,u:'',q:1},{n:'ব্যাটারি ব্যাকআপ রুম',c:300000,u:'',q:1},
+    {n:'কুলিং টাওয়ার',c:500000,u:'',q:1},{n:'কম্প্রেসর রুম',c:400000,u:'',q:1},
+    {n:'জেনারেটর রুম (বড়)',c:500000,u:'',q:1},{n:'ফায়ার পাম্প হাউস',c:300000,u:'',q:1},
+    {n:'PPE স্টোর ও ডিসপেন্সার',c:100000,u:'',q:1},{n:'সেফটি অফিস',c:150000,u:'',q:1},
+    {n:'মেডিকেল রুম',c:200000,u:'',q:1},{n:'এম্বুলেন্স বে',c:200000,u:'',q:1},
+    {n:'রেইনওয়াটার হার্ভেস্টিং',c:300000,u:'',q:1},{n:'পানি পুনর্ব্যবহার সিস্টেম',c:500000,u:'',q:1},
+    {n:'হ্যাজার্ড স্টোর (কেমিক্যাল)',c:400000,u:'',q:1},{n:'স্প্রিংকলার সিস্টেম',c:400000,u:'',q:1},
+    {n:'শ্রমিক প্রশিক্ষণ কেন্দ্র',c:300000,u:'',q:1},{n:'ক্রীড়া মাঠ',c:200000,u:'',q:1},
+    {n:'অফিসার কোয়ার্টার',c:500000,u:'',q:1},{n:'পার্কিং (কর্মচারী)',c:100000,u:'স্থান',q:20},
+    {n:'সাব-কন্ট্রাক্টর এরিয়া',c:200000,u:'',q:1},{n:'মালামাল সাজানোর এরিয়া',c:200000,u:'',q:1},
+    {n:'ইন্টারনাল রাস্তা পেভমেন্ট',c:150,u:'sqft',q:3000},{n:'ড্রেন ও স্টর্ম ওয়াটার',c:300000,u:'',q:1},
+    {n:'গাছপালা ও সবুজায়ন',c:150000,u:'',q:1},{n:'অ্যানার্জি অডিট সিস্টেম',c:100000,u:'',q:1},
+  ],
+  garments:[
+    {n:'উৎপাদন ফ্লোর সেটআপ',c:600000,u:'ফ্লোর',q:3},{n:'QC রুম (ফুল)',c:400000,u:'',q:1},
+    {n:'স্যাম্পল রুম',c:250000,u:'',q:1},{n:'ওয়াশিং প্ল্যান্ট',c:2000000,u:'',q:1},
+    {n:'কমপ্লায়েন্স অডিট রুম',c:200000,u:'',q:1},{n:'ওয়ার্কার ওয়েলফেয়ার',c:500000,u:'',q:1},
+    {n:'ডে কেয়ার (শিশু)',c:250000,u:'',q:1},{n:'মেডিকেল রুম',c:200000,u:'',q:1},
+    {n:'ডাইনিং হল (বড়)',c:800000,u:'',q:1},{n:'লকার রুম',c:250000,u:'',q:1},
+    {n:'ট্রেনিং রুম',c:250000,u:'',q:1},{n:'ফায়ার সিস্টেম (BGMEA)',c:400000,u:'',q:1},
+    {n:'জেনারেটর (বড়)',c:1500000,u:'',q:1},{n:'সোলার রুফটপ',c:80000,u:'kW',q:100},
+    {n:'ETP',c:2500000,u:'',q:1},{n:'রেইনওয়াটার হার্ভেস্টিং',c:250000,u:'',q:1},
+    {n:'বায়ার ভিজিট লাউঞ্জ',c:500000,u:'',q:1},{n:'প্রার্থনা কক্ষ',c:120000,u:'',q:1},
+    {n:'বায়োমেট্রিক অ্যাটেন্ডেন্স',c:150000,u:'',q:1},{n:'স্যুয়ারেজ ট্রিটমেন্ট',c:1500000,u:'',q:1},
+    {n:'গার্মেন্টস ইনস্পেকশন রুম',c:300000,u:'',q:1},{n:'ফিনিশিং ডিপার্টমেন্ট',c:400000,u:'ফ্লোর',q:1},
+    {n:'প্যাকেজিং এরিয়া',c:300000,u:'',q:1},{n:'ইন্টার্নাল ইকোমার্স সিস্টেম',c:200000,u:'',q:1},
+    {n:'ইন্টারনাল ট্রলি সিস্টেম',c:300000,u:'',q:1},{n:'শ্রমিক প্রশিক্ষণ সেল',c:200000,u:'',q:1},
+    {n:'স্মোকিং জোন',c:50000,u:'',q:1},{n:'লস প্রিভেনশন সিস্টেম',c:200000,u:'',q:1},
+    {n:'রুফটপ হেলিপ্যাড',c:2500000,u:'',q:1},{n:'ফ্যাক্টরি সিগনেজ',c:150000,u:'',q:1},
+    {n:'পোশাক স্টোর',c:150000,u:'',q:1},{n:'ডিসপ্লে রুম',c:300000,u:'',q:1},
+    {n:'ফ্যাবরিক ওয়্যারহাউস',c:600000,u:'',q:1},{n:'ফিনিশড গুডস স্টোর',c:600000,u:'',q:1},
+    {n:'মিটিং রুম',c:200000,u:'টি',q:2},{n:'HR অফিস',c:150000,u:'',q:1},
+    {n:'ব্যবস্থাপনা অফিস',c:400000,u:'',q:1},{n:'গেস্ট হাউস',c:600000,u:'',q:1},
+    {n:'লন্ড্রি রুম',c:200000,u:'',q:1},{n:'ক্লিনিং সাপ্লাই স্টোর',c:80000,u:'',q:1},
+    {n:'ফ্যাক্টরি ট্যুর পথ',c:100000,u:'',q:1},{n:'কার্বন ক্রেডিট সার্টিফিকেশন',c:150000,u:'',q:1},
+    {n:'ইন্ডাস্ট্রিয়াল ওয়াশরুম',c:200000,u:'ফ্লোর',q:5},{n:'ব্রেক রুম',c:150000,u:'',q:1},
+    {n:'রিক্রিয়েশন এরিয়া',c:250000,u:'',q:1},{n:'পার্কিং (শ্রমিক)',c:80000,u:'স্থান',q:20},
+    {n:'অফিসার পার্কিং',c:100000,u:'স্থান',q:5},{n:'বাস পার্কিং',c:150000,u:'',q:1},
+    {n:'মেইন গেট সিকিউরিটি সিস্টেম',c:200000,u:'',q:1},{n:'পেরিমিটার ফেন্সিং',c:450,u:'ফুট',q:500},
+  ],
+  warehouse:[
+    {n:'হাই-বে র‍্যাকিং সিস্টেম',c:500,u:'sqft',q:5000},{n:'লোডিং ডক (প্রতিটি)',c:400000,u:'টি',q:3},
+    {n:'ওভারহেড ক্রেন (৫ টন)',c:1500000,u:'',q:1},{n:'ফায়ার স্প্রিংকলার',c:350000,u:'',q:1},
+    {n:'এক্সজস্ট ফ্যান (বড়)',c:70000,u:'টি',q:6},{n:'LED হাই-বে লাইট',c:25000,u:'টি',q:20},
+    {n:'গার্ড হাউস',c:100000,u:'',q:1},{n:'ফোর্কলিফট চার্জিং স্টেশন',c:120000,u:'',q:1},
+    {n:'ওজন কাঁটা (Weighbridge)',c:600000,u:'',q:1},{n:'অফিস মেজানাইন',c:600000,u:'',q:1},
+    {n:'CCTV সিস্টেম',c:200000,u:'',q:1},{n:'পোর্টেবল পার্টিশন',c:250000,u:'',q:1},
+    {n:'ইন্টারনাল রাস্তা পেভমেন্ট',c:150,u:'sqft',q:2000},{n:'রেইনওয়াটার ড্রেন',c:250000,u:'',q:1},
+    {n:'ট্রাক পার্কিং',c:120000,u:'টি',q:5},{n:'সোলার প্যানেল (ছাদে)',c:80000,u:'kW',q:30},
+    {n:'RFID ট্র্যাকিং সিস্টেম',c:250000,u:'',q:1},{n:'ইমার্জেন্সি এক্সিট',c:60000,u:'টি',q:4},
+    {n:'সিকিউরিটি শাটার',c:35000,u:'টি',q:5},{n:'হিট-ইনসুলেটেড রুফ',c:80,u:'sqft',q:5000},
+    {n:'পেস্ট কন্ট্রোল সিস্টেম',c:60000,u:'',q:1},{n:'ডাস্ট সাপ্রেশন সিস্টেম',c:200000,u:'',q:1},
+    {n:'অটো ডক লেভেলার',c:200000,u:'টি',q:3},{n:'স্টোর ম্যানেজমেন্ট সফটওয়্যার',c:200000,u:'',q:1},
+    {n:'বারকোড স্ক্যানার সিস্টেম',c:150000,u:'',q:1},{n:'ব্যাটারি চার্জিং স্টেশন',c:200000,u:'',q:1},
+    {n:'স্প্রিংকলার ট্যাংক',c:300000,u:'',q:1},{n:'পানীয় জলের ব্যবস্থা',c:80000,u:'',q:1},
+    {n:'স্যানিটেশন সুবিধা',c:150000,u:'',q:1},{n:'ব্রেকরুম',c:120000,u:'',q:1},
+    {n:'ফ্রিজার জোন',c:1500000,u:'',q:1},{n:'হ্যাজার্ডাস মেটেরিয়াল স্টোর',c:300000,u:'',q:1},
+    {n:'কাস্টমস ইন্সপেকশন এরিয়া',c:200000,u:'',q:1},{n:'স্যাম্পল রুম',c:150000,u:'',q:1},
+    {n:'প্যাকেজিং টেবল',c:30000,u:'টি',q:5},{n:'শ্রিংক র‍্যাপ মেশিন এরিয়া',c:200000,u:'',q:1},
+    {n:'কনভেয়ার সিস্টেম',c:800000,u:'',q:1},{n:'অটোমেটিক সর্টিং',c:2000000,u:'',q:1},
+    {n:'ঠান্ডা মেঝে',c:200,u:'sqft',q:1000},{n:'উষ্ণ স্টোরেজ জোন',c:300000,u:'',q:1},
+    {n:'ডকুমেন্ট রুম',c:100000,u:'',q:1},{n:'IT নেটওয়ার্ক রুম',c:200000,u:'',q:1},
+    {n:'মেইন্টেন্যান্স ওয়ার্কশপ',c:300000,u:'',q:1},{n:'ফায়ার এক্সটিংগুইশার ক্যাবিনেট',c:10000,u:'টি',q:10},
+    {n:'রিসাইক্লিং জোন',c:100000,u:'',q:1},{n:'পরিচ্ছন্নতা স্টেশন',c:50000,u:'',q:1},
+    {n:'ঈদ/পূজা বোনাস রুম',c:50000,u:'',q:1},{n:'কর্মচারী শেষ কাজের সার্টিফিকেশন কক্ষ',c:50000,u:'',q:1},
+  ],
+  office:[
+    {n:'মডুলার ওয়ার্কস্টেশন (২০টি)',c:500000,u:'',q:1},{n:'কনফারেন্স রুম',c:500000,u:'টি',q:2},
+    {n:'রিসেপশন এরিয়া',c:400000,u:'',q:1},{n:'সার্ভার রুম',c:600000,u:'',q:1},
+    {n:'ভিডিও কনফারেন্স সিস্টেম',c:250000,u:'',q:1},{n:'সেন্ট্রাল AC (VRF)',c:150000,u:'টন',q:5},
+    {n:'UPS ব্যাকআপ সিস্টেম',c:300000,u:'',q:1},{n:'বায়োমেট্রিক + RFID',c:200000,u:'',q:1},
+    {n:'ক্যান্টিন / পান্ট্রি',c:300000,u:'',q:1},{n:'স্মার্ট লাইটিং কন্ট্রোল',c:250000,u:'',q:1},
+    {n:'লাউঞ্জ / ব্রেকআউট',c:350000,u:'',q:1},{n:'ডিজিটাল ডিসপ্লে (লবি)',c:120000,u:'টি',q:3},
+    {n:'সাউন্ড মাস্কিং',c:180000,u:'',q:1},{n:'এক্সিকিউটিভ টয়লেট',c:250000,u:'',q:1},
+    {n:'ব্র্যান্ডেড সিগনেজ',c:250000,u:'',q:1},{n:'EV চার্জিং',c:60000,u:'টি',q:5},
+    {n:'কো-ওয়ার্কিং স্পেস',c:500000,u:'',q:1},{n:'ফোন বুথ (প্রাইভেট)',c:80000,u:'টি',q:3},
+    {n:'মেডিটেশন / নামাজ রুম',c:150000,u:'',q:1},{n:'মাদার্স রুম',c:100000,u:'',q:1},
+    {n:'স্মার্ট মিটিং রুম',c:300000,u:'টি',q:2},{n:'ডিজিটাল হোয়াইটবোর্ড',c:80000,u:'টি',q:3},
+    {n:'অটো টি/কফি মেশিন',c:80000,u:'',q:1},{n:'গেমিং/রিল্যাক্স রুম',c:300000,u:'',q:1},
+    {n:'লাইব্রেরি কর্নার',c:100000,u:'',q:1},{n:'রুফটপ গার্ডেন অফিস',c:500000,u:'',q:1},
+    {n:'ইন্ডোর প্ল্যান্ট ওয়াল',c:200000,u:'',q:1},{n:'আর্টওয়ার্ক কিউরেশন',c:300000,u:'',q:1},
+    {n:'ডে লাইটিং সিস্টেম',c:200000,u:'',q:1},{n:'স্মার্ট গ্লাস পার্টিশন',c:500,u:'sqft',q:500},
+    {n:'অ্যাকোস্টিক সিলিং',c:400,u:'sqft',q:1000},{n:'এলিভেটেড ফ্লোর (Data)',c:500,u:'sqft',q:500},
+    {n:'পোর্টেবল ডেস্ক সিস্টেম',c:15000,u:'টি',q:10},{n:'এরগোনমিক চেয়ার (বাল্ক)',c:8000,u:'টি',q:20},
+    {n:'স্ট্যান্ডিং ডেস্ক',c:15000,u:'টি',q:10},{n:'বাইক স্টোরেজ',c:50000,u:'',q:1},
+    {n:'শাওয়ার রুম',c:100000,u:'',q:1},{n:'লকার রুম (কর্মী)',c:150000,u:'',q:1},
+    {n:'ফিটনেস কর্নার',c:200000,u:'',q:1},{n:'অফিস অ্যাপ (HR)',c:200000,u:'',q:1},
+    {n:'ডিজিটাল সাইনিন সিস্টেম',c:100000,u:'',q:1},{n:'উইল কল পিকআপ',c:50000,u:'',q:1},
+    {n:'নিউজলেটার ডিসপ্লে',c:30000,u:'',q:1},{n:'সুরক্ষিত ডকুমেন্ট রুম',c:200000,u:'',q:1},
+    {n:'AI অ্যাসিস্ট্যান্ট কিয়স্ক',c:300000,u:'',q:1},{n:'পরিবেশ সনদ (LEED)',c:500000,u:'',q:1},
+    {n:'রেইনওয়াটার হার্ভেস্টিং',c:200000,u:'',q:1},{n:'সোলার প্যানেল',c:80000,u:'kW',q:20},
+  ],
+  _default:[
+    {n:'অতিরিক্ত পার্কিং স্পেস',c:120000,u:'টি',q:2},{n:'সিসি ক্যামেরা সিস্টেম',c:80000,u:'',q:1},
+    {n:'ফায়ার এক্সটিংগুইশার সেট',c:30000,u:'',q:1},{n:'ইন্টারনেট ক্যাবলিং',c:40000,u:'',q:1},
+    {n:'LED লাইটিং আপগ্রেড',c:60000,u:'',q:1},{n:'ইন্টারকম সিস্টেম',c:25000,u:'',q:1},
+    {n:'হুইলচেয়ার র‍্যাম্প',c:40000,u:'',q:1},{n:'অটোমেটিক গেট',c:200000,u:'',q:1},
+    {n:'ওভারহেড ট্যাংক',c:80000,u:'',q:1},{n:'সোলার প্যানেল',c:80000,u:'kW',q:5},
+    {n:'জেনারেটর ব্যাকআপ',c:15000,u:'kVA',q:25},{n:'ওয়াটার পিউরিফায়ার',c:50000,u:'',q:1},
+    {n:'ফায়ার অ্যালার্ম',c:100000,u:'',q:1},{n:'ল্যান্ডস্কেপিং',c:200000,u:'',q:1},
+    {n:'EV চার্জিং পয়েন্ট',c:60000,u:'টি',q:2},{n:'স্মার্ট মিটার',c:80000,u:'',q:1},
+    {n:'PA/সাউন্ড সিস্টেম',c:150000,u:'',q:1},{n:'ডিজিটাল ডিসপ্লে',c:80000,u:'',q:1},
+    {n:'পানির সফটেনার',c:70000,u:'',q:1},{n:'গ্রীন ওয়াল',c:200000,u:'',q:1},
+    {n:'রেইনওয়াটার হার্ভেস্টিং',c:100000,u:'',q:1},{n:'সেন্ট্রাল AC',c:150000,u:'টন',q:3},
+    {n:'UPS সিস্টেম',c:200000,u:'',q:1},{n:'বায়োমেট্রিক সিস্টেম',c:100000,u:'',q:1},
+    {n:'ভিজিটর ম্যানেজমেন্ট',c:80000,u:'',q:1},{n:'ছাদ বাগান',c:150000,u:'',q:1},
+    {n:'সুইমিং পুল',c:2000000,u:'',q:1},{n:'ফিটনেস সেন্টার',c:500000,u:'',q:1},
+    {n:'কনফারেন্স রুম',c:400000,u:'',q:1},{n:'ক্যান্টিন',c:400000,u:'',q:1},
+    {n:'সার্ভার রুম',c:400000,u:'',q:1},{n:'মেডিকেল রুম',c:150000,u:'',q:1},
+    {n:'প্রার্থনা কক্ষ',c:100000,u:'',q:1},{n:'লাইব্রেরি',c:300000,u:'',q:1},
+    {n:'অডিটোরিয়াম',c:2000000,u:'',q:1},{n:'আউটডোর সিটিং',c:150000,u:'',q:1},
+    {n:'কিডস এরিয়া',c:200000,u:'',q:1},{n:'গার্বেজ ম্যানেজমেন্ট',c:80000,u:'',q:1},
+    {n:'সাইনেজ ও ওয়েফাইন্ডিং',c:150000,u:'',q:1},{n:'আর্টওয়ার্ক ও ডেকোরেশন',c:300000,u:'',q:1},
+    {n:'পোষ্টাল ব্যবস্থা',c:30000,u:'',q:1},{n:'স্টোর রুম',c:100000,u:'',q:1},
+    {n:'ডাম্বওয়েটার',c:200000,u:'',q:1},{n:'হেলিপ্যাড',c:3000000,u:'',q:1},
+    {n:'ইভেন্ট স্পেস',c:500000,u:'',q:1},{n:'স্পোর্টস কোর্ট',c:500000,u:'',q:1},
+    {n:'মাল্টিপারপাস হল',c:800000,u:'',q:1},{n:'ট্রেনিং রুম',c:250000,u:'',q:1},
+    {n:'স্টোরেজ মেজানাইন',c:400000,u:'',q:1},{n:'ব্যাকআপ পাওয়ার সিস্টেম',c:500000,u:'',q:1},
+  ]
+};
+function getFeatureKey(v){
+  const m={res_single:'res_single',res_double:'res_single',villa:'res_single',dorm:'res_single',staff_qtr:'res_single',
+    apt:'apt',hospital:'hospital',clinic:'hospital',med_college:'hospital',pharma:'hospital',
+    hotel3:'hotel3',hotel5:'hotel3',budget_hotel:'hotel3',resort:'hotel3',community:'hotel3',convention:'hotel3',
+    school:'school',primary_school:'school',college:'school',university:'school',madrasa:'school',kg:'school',
+    mosque:'mosque',temple:'mosque',church:'mosque',eidgah:'mosque',
+    factory:'factory',food_proc:'factory',cold:'factory',brick_kiln:'factory',
+    garments:'garments',warehouse:'warehouse',petrol:'warehouse',agri_store:'warehouse',poultry:'warehouse',
+    office:'office',bank:'office',govt_office:'office',courthouse:'office',showroom:'office',retail:'office',mall:'office',police:'office'};
+  return m[v]||'_default';
+}
+
+// LABOR DATA (PWD SOR 2023 rates)
+let laborData=[
+  {name:'সাইট ইঞ্জিনিয়ার/সুপারভাইজার',role:'engineer',count:1,wage:3500,days:180,mdpersqft:0.012},
+  {name:'হেড মিস্ত্রি (মেসন)',role:'master',count:2,wage:1200,days:150,mdpersqft:0.05},
+  {name:'রড বাইন্ডার মিস্ত্রি',role:'skilled',count:4,wage:900,days:100,mdpersqft:0.04},
+  {name:'কার্পেন্টার (ছুতার)',role:'skilled',count:2,wage:1000,days:80,mdpersqft:0.025},
+  {name:'ইলেকট্রিশিয়ান',role:'skilled',count:2,wage:1000,days:50,mdpersqft:0.015},
+  {name:'প্লাম্বার',role:'skilled',count:2,wage:950,days:45,mdpersqft:0.012},
+  {name:'পেইন্টার',role:'semi',count:3,wage:800,days:35,mdpersqft:0.018},
+  {name:'টাইলস মিস্ত্রি',role:'skilled',count:2,wage:950,days:40,mdpersqft:0.020},
+  {name:'হেল্পার / কুলি',role:'helper',count:8,wage:600,days:150,mdpersqft:0.06},
 ];
-let compareProjects = [];
-let calcCount = 0, savedCount = 0;
-let badgesEarned = [];
-let checklistState = {};
-let priceChartObj = null, donutChartObj = null, matChartObj = null, floorChartObj = null, workdayChartObj = null;
-let lastTotal = 0;
+const DEFAULT_LABOR=JSON.parse(JSON.stringify(laborData));
+const ROLE_TAGS={engineer:'tag-engineer',master:'tag-master',skilled:'tag-skilled',semi:'tag-semi',helper:'tag-helper'};
+const ROLE_LABELS={engineer:'ইঞ্জিনিয়ার',master:'হেড মিস্ত্রি',skilled:'দক্ষ',semi:'আধা-দক্ষ',helper:'সাহায্যকারী'};
 
-// Price history data (last 12 months, illustrative Bangladesh market data)
-const priceHistory = {
-  rod:   [82,84,85,87,88,90,88,92,93,91,93,95],
-  cement:[510,512,515,518,520,522,518,520,525,522,518,520],
-  brick: [12500,12600,12700,12800,12800,13000,13200,13500,13800,14000,14000,14000],
-  sand:  [36,36,37,37,38,38,38,38,38,38,38,38],
-};
-const months = ['জুন','জুলাই','আগস্ট','সেপ্টে','অক্টো','নভে','ডিসে','জানু','ফেব্রু','মার্চ','এপ্রিল','মে'];
-const workdays = [26,26,26,25,24,22,20,18,18,22,24,25]; // monthly effective workdays considering rain
+// STATE
+let currency='BDT';
+const EX={BDT:1,USD:0.0091,INR:0.76};
+const SYM={BDT:'৳',USD:'$',INR:'₹'};
+let donutChart=null,matChart=null,floorChart=null;
+let prevManday=0,prevLaborCost=0;
 
-// Theme
-function toggleTheme() {
-  const html = document.documentElement;
-  const isDark = html.getAttribute('data-theme') === 'dark';
-  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  document.getElementById('themeBtn').classList.toggle('dark', !isDark);
-  try { localStorage.setItem('nirman-theme', isDark ? 'light' : 'dark'); } catch(e){}
-}
+// UTILS
+function fmt(n){if(isNaN(n)||n<0)n=0;const v=n*EX[currency];const s=SYM[currency];if(currency==='BDT')return s+' '+Math.round(v).toLocaleString('en-IN');return s+' '+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function vp(el){const v=parseFloat(el.value);if(isNaN(v)||v<0){el.value=0;el.classList.add('is-error');setTimeout(()=>el.classList.remove('is-error'),1500);}else el.classList.remove('is-error');}
+function g(id){return document.getElementById(id);}
+function s(id,v){const el=g(id);if(el)el.textContent=v;}
+function setCurrency(c,btn){currency=c;document.querySelectorAll('.cur-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');recalculate();}
 
-// Currency
-function setCurrency(c, el) {
-  currency = c;
-  document.querySelectorAll('.cur-btn').forEach(b => b.classList.remove('active'));
-  if(el) el.classList.add('active');
+// SIDEBAR
+function toggleSidebar(){g('sidebar').classList.toggle('open');g('overlay').classList.toggle('show');}
+function closeSidebar(){g('sidebar').classList.remove('open');g('overlay').classList.remove('show');}
+
+// LOCATION
+function updateDistricts(){
+  const div=g('division').value;const dsel=g('district');
+  dsel.innerHTML='<option value="">-- জেলা নির্বাচন --</option>';
+  (DISTRICTS[div]||[]).forEach(d=>dsel.innerHTML+=`<option value="${d}">${d}</option>`);
+  g('upazila').innerHTML='<option value="">-- উপজেলা --</option>';
   recalculate();
 }
-
-// Navigation
-const pageTitles = {
-  location:['লোকেশন ও পরিবেশ','এলাকা নির্বাচন করুন'],
-  building:['বিল্ডিং কনফিগারেশন','বিল্ডিং ধরণ ও আয়তন'],
-  materials:['ম্যাটেরিয়াল টেকঅফ','স্বয়ংক্রিয় হিসাব'],
-  labor:['শ্রমিক ও যন্ত্রপাতি','শ্রমিক মজুরি হিসাব'],
-  extras:['অতিরিক্ত সুবিধা','সোলার, জেনারেটর, ইন্টেরিয়র'],
-  floorfinish:['তলা অনুযায়ী ফিনিশিং','প্রতি তলার আলাদা উপকরণ'],
-  special:['স্পেশাল ফিচারস','বিল্ডিং টাইপ ভিত্তিক'],
-  financial:['আর্থিক ও সরকারি ফি','ভ্যাট, রাজউক, ঋণ'],
-  boq:['BOQ জেনারেটর','Bill of Quantity'],
-  contract:['কন্ট্রাক্ট ম্যানেজমেন্ট','পেমেন্ট মাইলস্টোন'],
-  ai:['AI নির্মাণ উপদেষ্টা','Claude AI দিয়ে পরামর্শ'],
-  prices:['মূল্য ট্রেন্ড','গত ১২ মাসের বাজার বিশ্লেষণ'],
-  weather:['আবহাওয়া ও বিলম্ব','নির্মাণ বিলম্ব প্রাক্কলন'],
-  checklist:['কোয়ালিটি চেকলিস্ট','ISO মান অনুসরণ'],
-  compare:['মাল্টি-প্রজেক্ট তুলনা','পাশাপাশি বিশ্লেষণ'],
-  badges:['গেমিফিকেশন ব্যাজ','আপনার অর্জনসমূহ'],
-  report:['রিপোর্ট ও QR কোড','সম্পূর্ণ রিপোর্ট'],
-};
-function showSection(name) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const sec = document.getElementById('section-'+name);
-  if(sec) sec.classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => {
-    if(n.getAttribute('onclick') === `showSection('${name}')`) n.classList.add('active');
-  });
-  const t = pageTitles[name];
-  if(t) { document.getElementById('page-title').textContent = t[0]; document.getElementById('page-sub').textContent = t[1]; }
-  if(name==='boq') renderBOQ();
-  if(name==='contract') renderMilestones();
-  if(name==='weather') { calcWeatherDelay(); renderWorkdayChart(); }
-  if(name==='checklist') renderChecklist();
-  if(name==='badges') renderBadges();
-  if(name==='prices') showPriceChart('rod', document.querySelector('.inner-tab'));
-  if(name==='report') { renderReport(); generateQR(); }
+function updateUpazilas(){
+  const dist=g('district').value;const usel=g('upazila');
+  usel.innerHTML='<option value="">-- উপজেলা --</option>';
+  (UPAZILAS[dist]||[]).forEach(u=>usel.innerHTML+=`<option value="${u}">${u}</option>`);
+  const note=DISTRICT_NOTES[dist]||'';
+  const nb=g('location-note');
+  if(note){nb.style.display='flex';nb.textContent='📌 '+note;}else nb.style.display='none';
   recalculate();
 }
+function onUpazilaChange(){recalculate();}
 
-// Location
-function updateDistricts() {
-  const div = document.getElementById('division').value;
-  const dsel = document.getElementById('district');
-  dsel.innerHTML = '<option value="">-- জেলা --</option>';
-  (districts[div]||[]).forEach(d => { dsel.innerHTML += `<option value="${d}">${d}</option>`; });
-  document.getElementById('upazila').innerHTML = '<option value="">-- উপজেলা --</option>';
-  recalculate();
+// BUILDING TYPES
+function filterBuildingTypes(){
+  const cat=g('bldg-cat').value;const sel=g('bldg-type');const cur=sel.value;
+  sel.innerHTML='';
+  const filtered=cat==='all'?BUILDING_TYPES:BUILDING_TYPES.filter(b=>b.cat===cat);
+  filtered.forEach(b=>sel.innerHTML+=`<option value="${b.val}" data-factor="${b.factor}">${b.label} ×${b.factor}</option>`);
+  if(cur) sel.value=cur;
+  onBuildingTypeChange();
 }
-function updateUpazilas() {
-  const dist = document.getElementById('district').value;
-  const usel = document.getElementById('upazila');
-  usel.innerHTML = '<option value="">-- উপজেলা --</option>';
-  (upazilas[dist]||[]).forEach(u => { usel.innerHTML += `<option value="${u}">${u}</option>`; });
-  recalculate();
-}
+function getBuildingFactor(){const o=g('bldg-type').options[g('bldg-type').selectedIndex];return o?parseFloat(o.getAttribute('data-factor'))||1.0:1.0;}
+function onBuildingTypeChange(){renderSpecialFeatures();recalculate();}
 
-// Labor
-function renderLaborList() {
-  const el = document.getElementById('labor-list');
-  if(!el) return;
-  el.innerHTML = laborData.map((l,i) => `
-    <div class="labor-row">
-      <input type="text" value="${l.name}" onchange="laborData[${i}].name=this.value">
-      <input type="number" value="${l.count}" min="1" onchange="laborData[${i}].count=+this.value; recalculate()">
-      <input type="number" value="${l.wage}" onchange="laborData[${i}].wage=+this.value; recalculate()">
-      <input type="number" value="${l.days}" onchange="laborData[${i}].days=+this.value; recalculate()">
-      <span class="labor-total-cell">৳ ${Math.round(l.count*l.wage*l.days).toLocaleString()}</span>
-      <button onclick="laborData.splice(${i},1); renderLaborList(); recalculate();" style="background:none; border:none; cursor:pointer; color:var(--danger); font-size:16px;">×</button>
-    </div>`).join('');
-}
-function addLaborRow() {
-  laborData.push({name:'নতুন শ্রমিক',count:1,wage:700,days:30});
-  renderLaborList(); recalculate();
-}
-function resetLabor() {
-  laborData = [{name:'হেড মিস্ত্রি',count:2,wage:1200,days:120},{name:'রড বাইন্ডার',count:4,wage:900,days:90},{name:'ইলেকট্রিশিয়ান',count:2,wage:1000,days:45},{name:'প্লাম্বার',count:2,wage:950,days:40},{name:'পেইন্টার',count:3,wage:800,days:30},{name:'হেল্পার',count:6,wage:600,days:120}];
-  renderLaborList(); recalculate();
-}
-
-// Special features
-function onBuildingTypeChange() { renderSpecialFeatures(); recalculate(); }
-function renderSpecialFeatures() {
-  const btype = document.getElementById('bldg-type').value;
-  const feats = specialFeatures[btype] || specialFeatures['1.0'];
-  const title = document.getElementById('bldg-type').options[document.getElementById('bldg-type').selectedIndex].text;
-  const st = document.getElementById('special-title');
-  if(st) st.innerHTML = `⭐ স্পেশাল ফিচারস (${title})`;
-  const cont = document.getElementById('special-features');
-  if(!cont) return;
-  cont.innerHTML = feats.map((f,i) => `
-    <div class="feature-item" id="feat-${i}" onclick="toggleFeat(${i})">
-      <div class="feature-item-top">
-        <input type="checkbox" id="fchk-${i}" onclick="event.stopPropagation()">
-        <span>${f.n}</span>
+// SPECIAL FEATURES
+function renderSpecialFeatures(){
+  const val=g('bldg-type').value;const key=getFeatureKey(val);
+  const feats=SF[key]||SF['_default'];
+  const lblEl=g('bldg-type').options[g('bldg-type').selectedIndex];
+  const lbl=lblEl?lblEl.text.split(' ×')[0]:'বিল্ডিং';
+  s('special-bldg-name',lbl);s('special-card-title',lbl+' — স্পেশাল ফিচারস');
+  g('feat-count-chip').textContent=feats.length+'টি ফিচার';
+  const cont=g('special-features');cont.innerHTML='';
+  feats.forEach((f,i)=>{
+    cont.innerHTML+=`<div class="feat-item" id="fw-${i}" onclick="toggleFeat(${i})">
+      <div class="feat-top">
+        <input type="checkbox" class="feat-chk" id="fc-${i}" onclick="event.stopPropagation();updateFeatCount();recalculate()">
+        <span class="feat-name">${f.n}</span>
       </div>
-      <div class="feature-cost">৳ ${f.c.toLocaleString()}</div>
-    </div>`).join('');
+      <div class="feat-bottom">
+        <span class="feat-cost">৳ <strong>${f.c.toLocaleString()}</strong>${f.u?' / '+f.u:''}</span>
+        ${f.u?`<input type="number" class="feat-qty-input" id="fq-${i}" value="${f.q}" min="1" onclick="event.stopPropagation()" onchange="vp(this);recalculate()">`:``}
+      </div>
+    </div>`;
+  });
+  updateFeatCount();recalculate();
 }
-function toggleFeat(i) {
-  const chk = document.getElementById('fchk-'+i);
-  const item = document.getElementById('feat-'+i);
-  if(chk) chk.checked = !chk.checked;
-  if(item) item.classList.toggle('selected', chk && chk.checked);
-  recalculate();
+function toggleFeat(i){
+  const chk=g(`fc-${i}`);const wrap=g(`fw-${i}`);
+  chk.checked=!chk.checked;wrap.classList.toggle('selected',chk.checked);
+  updateFeatCount();recalculate();
 }
-function getSpecialTotal() {
-  const btype = document.getElementById('bldg-type').value;
-  const feats = specialFeatures[btype] || specialFeatures['1.0'];
-  return feats.reduce((s,f,i) => {
-    const chk = document.getElementById('fchk-'+i);
-    return s + (chk && chk.checked ? f.c : 0);
-  }, 0);
+function updateFeatCount(){
+  let c=0;document.querySelectorAll('.feat-chk').forEach(ch=>{if(ch.checked)c++;});
+  s('feat-selected-count',c);
 }
-
-// Floor finishing
-function renderFloorFinish() {
-  const floors = +document.getElementById('floors').value || 1;
-  const cont = document.getElementById('floor-finish-list');
-  if(!cont) return;
-  const flooring = ['মার্বেল (+৳৮০/sqft)','সিরামিক টাইলস (+৳৪৫/sqft)','গ্রানাইট (+৳১৫০/sqft)','ভিনাইল (+৳৩০/sqft)','মসৃণ সিমেন্ট (স্ট্যান্ডার্ড)'];
-  const walls = ['মার্বেল ক্ল্যাডিং (+৳৬০/sqft)','সিরামিক টাইলস (+৳৪০/sqft)','ইটালিয়ান টাইলস (+৳৯০/sqft)','পেইন্ট (স্ট্যান্ডার্ড)'];
-  const ceiling = ['ফলস সিলিং (+৳৫৫/sqft)','গাছ সিলিং (+৳৮০/sqft)','সাধারণ (স্ট্যান্ডার্ড)'];
-  cont.innerHTML = Array.from({length:Math.min(floors,15)},(_,i) => `
-    <div class="floor-finish-row">
-      <span style="font-weight:600;">${i===0?'নিচতলা':i+' তলা'}</span>
-      <select id="ff-floor-${i}" onchange="calcFinishExtra()">
-        ${flooring.map((f,j) => `<option value="${[80,45,150,30,0][j]}">${f}</option>`).join('')}
-      </select>
-      <select id="ff-wall-${i}" onchange="calcFinishExtra()">
-        ${walls.map((w,j) => `<option value="${[60,40,90,0][j]}">${w}</option>`).join('')}
-      </select>
-      <select id="ff-ceil-${i}" onchange="calcFinishExtra()">
-        ${ceiling.map((c,j) => `<option value="${[55,80,0][j]}">${c}</option>`).join('')}
-      </select>
-      <span id="ff-cost-${i}" style="font-weight:700; color:var(--primary-dark); font-size:12px;">৳ ০</span>
-    </div>`).join('');
-  calcFinishExtra();
+function clearAllFeatures(){document.querySelectorAll('.feat-chk').forEach(ch=>{ch.checked=false;});document.querySelectorAll('.feat-item').forEach(w=>w.classList.remove('selected'));updateFeatCount();recalculate();}
+function selectCommonFeatures(){
+  [0,1,2,5,6].forEach(i=>{const chk=g(`fc-${i}`);if(chk){chk.checked=true;g(`fw-${i}`).classList.add('selected');}});
+  updateFeatCount();recalculate();
 }
-function calcFinishExtra() {
-  const floors = +document.getElementById('floors').value || 1;
-  const sqft = +document.getElementById('total-area').value || 0;
-  const sqftPerFloor = sqft / floors;
-  let total = 0;
-  for(let i=0; i<Math.min(floors,15); i++) {
-    const fv = +(document.getElementById('ff-floor-'+i)||{}).value || 0;
-    const wv = +(document.getElementById('ff-wall-'+i)||{}).value || 0;
-    const cv = +(document.getElementById('ff-ceil-'+i)||{}).value || 0;
-    const cost = (fv+wv+cv) * sqftPerFloor;
-    total += cost;
-    const costEl = document.getElementById('ff-cost-'+i);
-    if(costEl) costEl.textContent = '৳ '+Math.round(cost).toLocaleString();
-  }
-  const totalEl = document.getElementById('finish-extra-total');
-  if(totalEl) totalEl.textContent = fmt(total);
-  recalculate();
-  return total;
-}
-function getFinishExtra() {
-  const floors = +document.getElementById('floors').value || 1;
-  const sqft = +document.getElementById('total-area').value || 0;
-  const sqftPerFloor = sqft / floors;
-  let total = 0;
-  for(let i=0; i<Math.min(floors,15); i++) {
-    const fv = +(document.getElementById('ff-floor-'+i)||{}).value || 0;
-    const wv = +(document.getElementById('ff-wall-'+i)||{}).value || 0;
-    const cv = +(document.getElementById('ff-ceil-'+i)||{}).value || 0;
-    total += (fv+wv+cv) * sqftPerFloor;
-  }
-  return total;
+function getSpecialTotal(){
+  const val=g('bldg-type').value;const key=getFeatureKey(val);const feats=SF[key]||SF['_default'];
+  let t=0;
+  feats.forEach((f,i)=>{const chk=g(`fc-${i}`);if(chk&&chk.checked){const qEl=g(`fq-${i}`);const q=qEl?Math.max(1,+qEl.value):1;t+=f.c*q;}});
+  return t;
 }
 
-// Materials
-function calcMaterials(sqft) {
-  const brickRate = +document.getElementById('brick-brand').value || 14;
-  const cementRate = +document.getElementById('cement-brand').value || 520;
-  const rodFactor = +document.getElementById('rod-dia').value || 1.0;
+// EXTRAS TABS
+function showExtrasTab(name,btn){
+  document.querySelectorAll('.extras-tab').forEach(t=>t.style.display='none');
+  document.querySelectorAll('.sub-tab').forEach(b=>b.classList.remove('active'));
+  g('extras-'+name).style.display='block';btn.classList.add('active');
+}
+
+// LABOR
+function renderLaborList(){
+  const tb=g('labor-tbody');tb.innerHTML='';
+  laborData.forEach((l,i)=>{
+    const tot=l.count*l.wage*l.days;
+    tb.innerHTML+=`<tr>
+      <td style="padding-left:22px">
+        <input type="text" value="${l.name}" style="width:180px;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;font-family:var(--font-body);background:transparent;color:var(--text-primary)" onchange="laborData[${i}].name=this.value">
+        <span class="labor-role-tag ${ROLE_TAGS[l.role]||'tag-helper'}" style="margin-left:4px">${ROLE_LABELS[l.role]||''}</span>
+      </td>
+      <td><input type="number" value="${l.count}" min="1" style="width:60px;padding:4px 6px;border:1px solid var(--border);border-radius:4px;font-family:var(--font-body);font-size:12px" onchange="laborData[${i}].count=Math.max(1,+this.value);renderLaborList();recalculate()"></td>
+      <td><input type="number" value="${l.wage}" min="0" style="width:90px;padding:4px 6px;border:1px solid var(--border);border-radius:4px;font-family:var(--font-body);font-size:12px" onchange="laborData[${i}].wage=Math.max(0,+this.value);renderLaborList();recalculate()"></td>
+      <td><input type="number" value="${l.days}" min="1" style="width:70px;padding:4px 6px;border:1px solid var(--border);border-radius:4px;font-family:var(--font-body);font-size:12px" onchange="laborData[${i}].days=Math.max(1,+this.value);renderLaborList();recalculate()"></td>
+      <td style="color:var(--text-muted);font-size:11px">${l.mdpersqft||'—'} md/sqft</td>
+      <td class="labor-cost-cell" style="padding-right:12px">৳ ${Math.round(tot).toLocaleString()}</td>
+      <td style="padding-right:12px"><button class="del-btn" onclick="delLabor(${i})" title="মুছুন">✕</button></td>
+    </tr>`;
+  });
+}
+function delLabor(i){laborData.splice(i,1);renderLaborList();recalculate();}
+function addLaborRow(){
+  laborData.push({name:'নতুন শ্রমিক',role:'helper',count:1,wage:700,days:30,mdpersqft:0.01});
+  renderLaborList();recalculate();
+}
+function resetLabor(){laborData=JSON.parse(JSON.stringify(DEFAULT_LABOR));renderLaborList();recalculate();}
+
+// SOLAR ROI
+function calcSolarROI(){
+  const kw=Math.max(0,+g('solar-kw').value||0);const box=g('solar-roi-box');if(!box)return;
+  if(!kw){box.innerHTML='kW পরিমাণ দিন →';return;}
+  const cost=kw*80000;const bill=Math.max(0,+g('monthly-bill').value||5000);
+  const pct=+(g('solar-pct').value||70);const monthly=bill*(pct/100);
+  const yrs=monthly>0?cost/(monthly*12):0;
+  box.innerHTML=`<strong style="color:var(--green-700);font-size:16px">ROI: ${yrs.toFixed(1)} বছর</strong><br>ইনস্টলেশন: ৳${cost.toLocaleString()}<br>মাসিক সঞ্চয়: ৳${Math.round(monthly).toLocaleString()}`;
+}
+
+// LOAN
+function calcLoan(){
+  const P=Math.max(0,+g('loan-amt').value||0);const r=(Math.max(0,+g('loan-rate').value||9))/100/12;const n=(Math.max(1,+g('loan-years').value||15))*12;
+  if(P===0||r===0){s('emi-val','৳ ০');return;}
+  const emi=P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);const tot=emi*n;
+  s('emi-val','৳ '+Math.round(emi).toLocaleString());
+  s('loan-details','মোট পরিশোধ: ৳'+Math.round(tot).toLocaleString()+' | সুদ: ৳'+Math.round(tot-P).toLocaleString());
+}
+
+// MATERIALS
+function calcMaterials(sqft){
+  if(sqft<=0)sqft=1;
+  const doors=Math.max(0,+g('doors').value||8);const wins=Math.max(0,+g('windows').value||12);
+  const wa=sqft*0.35;
   return [
-    {n:'ইট',qty:Math.round(sqft*0.35*50.8),u:'পিস',r:brickRate,total:Math.round(sqft*0.35*50.8)*brickRate},
-    {n:'সিমেন্ট',qty:Math.round(sqft*0.38),u:'বস্তা',r:cementRate,total:Math.round(sqft*0.38)*cementRate},
-    {n:'বালি',qty:Math.round(sqft*1.2),u:'cft',r:38,total:Math.round(sqft*1.2)*38},
-    {n:'পাথর/খোয়া',qty:Math.round(sqft*0.8),u:'cft',r:55,total:Math.round(sqft*0.8)*55},
-    {n:'রড (Fe500)',qty:Math.round(sqft*4.5*rodFactor),u:'kg',r:95,total:Math.round(sqft*4.5*rodFactor)*95},
-    {n:'টাইলস',qty:Math.round(sqft*0.65),u:'sqft',r:85,total:Math.round(sqft*0.65)*85},
-    {n:'পেইন্ট',qty:Math.round(sqft*0.12),u:'লিটার',r:280,total:Math.round(sqft*0.12)*280},
-    {n:'ইলেকট্রিক তার',qty:Math.round(sqft*2.5),u:'মিটার',r:45,total:Math.round(sqft*2.5)*45},
-    {n:'স্যানিটারি সেট',qty:Math.max(1,Math.round(sqft/500)),u:'সেট',r:35000,total:Math.max(1,Math.round(sqft/500))*35000},
-    {n:'দরজা',qty:+document.getElementById('doors').value||8,u:'টি',r:12000,total:(+document.getElementById('doors').value||8)*12000},
-    {n:'জানালা',qty:+document.getElementById('windows').value||12,u:'টি',r:8000,total:(+document.getElementById('windows').value||12)*8000},
+    {name:'ইট (সাধারণ/First Class)',qty:Math.round(wa*50.8),unit:'পিস',rate:14,total:Math.round(wa*50.8)*14},
+    {name:'সিমেন্ট (OPC 50kg)',qty:Math.round(sqft*0.38),unit:'বস্তা',rate:520,total:Math.round(sqft*0.38)*520},
+    {name:'বালি (মোটা)',qty:Math.round(sqft*1.2),unit:'cft',rate:40,total:Math.round(sqft*1.2)*40},
+    {name:'পাথর / ক্রাশ স্টোন',qty:Math.round(sqft*0.8),unit:'cft',rate:60,total:Math.round(sqft*0.8)*60},
+    {name:'রড (Fe500D – ১২মিমি)',qty:Math.round(sqft*4.5),unit:'kg',rate:98,total:Math.round(sqft*4.5)*98},
+    {name:'টাইলস (ফ্লোর + ওয়াল)',qty:Math.round(sqft*0.7),unit:'sqft',rate:92,total:Math.round(sqft*0.7)*92},
+    {name:'পেইন্ট (ইমালশন + প্রাইমার)',qty:Math.round(sqft*0.13),unit:'লিটার',rate:295,total:Math.round(sqft*0.13)*295},
+    {name:'ইলেকট্রিক তার (2.5sq mm)',qty:Math.round(sqft*2.5),unit:'মিটার',rate:52,total:Math.round(sqft*2.5)*52},
+    {name:'স্যানিটারি সেট (সম্পূর্ণ)',qty:Math.max(1,Math.round(sqft/450)),unit:'সেট',rate:42000,total:Math.max(1,Math.round(sqft/450))*42000},
+    {name:'দরজা (কাঠ/অ্যালুমিনিয়াম)',qty:doors,unit:'টি',rate:15000,total:doors*15000},
+    {name:'জানালা (অ্যালুমিনিয়াম + গ্লাস)',qty:wins,unit:'টি',rate:10000,total:wins*10000},
+    {name:'ছাদ প্লাস্টার + সিলিং',qty:Math.round(sqft*0.92),unit:'sqft',rate:58,total:Math.round(sqft*0.92)*58},
+    {name:'ওয়াটারপ্রুফিং (ছাদ)',qty:Math.round(sqft/4),unit:'sqft',rate:130,total:Math.round(sqft/4)*130},
+    {name:'গ্রীল ও রেলিং (স্টিল)',qty:Math.round(sqft*0.03),unit:'kg',rate:120,total:Math.round(sqft*0.03)*120},
   ];
 }
 
-// MAIN CALC
-function recalculate() {
-  calcCount++;
-  const sqft = +document.getElementById('total-area').value || 0;
-  const floors = +document.getElementById('floors').value || 1;
-  const baseRate = +document.getElementById('base-rate').value || 2200;
-  const btype = +document.getElementById('bldg-type').value || 1.0;
-  const quality = +document.getElementById('quality').value || 1.0;
-  const structure = +document.getElementById('structure').value || 1.0;
-  const foundation = +document.getElementById('foundation').value || 0.12;
-  const cgrade = +document.getElementById('concrete-grade').value || 1.08;
-  const areaType = +document.getElementById('area-type').value || 1.0;
-  const seismic = +document.getElementById('seismic-zone').value || 1.05;
-  const flood = +document.getElementById('flood-risk').value || 1.10;
-  const specEnv = +document.getElementById('special-env').value || 1.0;
-  const lifts = +document.getElementById('lifts').value || 0;
-  const vat = +document.getElementById('vat').value || 15;
-  const contingency = +document.getElementById('contingency').value || 5;
-  const margin = +document.getElementById('margin').value || 10;
-  const inflation = +document.getElementById('inflation').value || 3;
-  const landPrice = +document.getElementById('land-price').value || 0;
-  const gasDist = +document.getElementById('gas-dist').value || 0;
+// CHARTS
+function updateCharts(bd,sqft,floors,baseCost){
+  const C=['#166534','#d97706','#0284c7','#dc2626','#7c3aed','#0d9488'];
+  if(donutChart)donutChart.destroy();
+  const dc=g('donutChart');
+  if(dc){donutChart=new Chart(dc,{type:'doughnut',data:{labels:['মূল নির্মাণ','শ্রমিক ও যন্ত্র','অতিরিক্ত','স্পেশাল','ভ্যাট ও চার্জ','সরকারি ফি'],datasets:[{data:[bd.base,bd.labor,bd.extras,bd.special,bd.vat,bd.govt],backgroundColor:C,borderWidth:2,borderColor:'#fff',hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' ৳'+Math.round(ctx.parsed).toLocaleString()}}}}}); 
+    const lg=g('donut-legend');if(lg){const labs=['মূল নির্মাণ','শ্রমিক ও যন্ত্র','অতিরিক্ত','স্পেশাল','ভ্যাট ও চার্জ','সরকারি ফি'];const vals=[bd.base,bd.labor,bd.extras,bd.special,bd.vat,bd.govt];const tot=vals.reduce((a,b)=>a+b,0);lg.innerHTML=labs.map((l,i)=>`<div class="legend-item"><div class="legend-dot" style="background:${C[i]}"></div><span class="legend-name">${l}</span><span class="legend-pct"> ${tot>0?Math.round(vals[i]/tot*100):0}%</span></div>`).join('');}}
 
-  // Env
-  const envFactor = areaType * seismic * flood * specEnv;
-  const ef = id => document.getElementById(id);
-  if(ef('ef1')) ef('ef1').textContent = areaType.toFixed(2);
-  if(ef('ef2')) ef('ef2').textContent = seismic.toFixed(2);
-  if(ef('ef3')) ef('ef3').textContent = flood.toFixed(2);
-  if(ef('ef4')) ef('ef4').textContent = specEnv.toFixed(2);
-  if(ef('env-combined')) ef('env-combined').textContent = envFactor.toFixed(3);
+  const fC=Math.min(floors,12);const fBase=baseCost/Math.max(1,floors);const fLabs=[],fData=[];
+  for(let i=1;i<=fC;i++){fLabs.push(i+'তলা');const f=i===1?1.18:i<=3?1.0:i<=7?0.95:0.88;fData.push(Math.round(fBase*f));}
+  if(floorChart)floorChart.destroy();const fc=g('floorChart');
+  if(fc)floorChart=new Chart(fc,{type:'bar',data:{labels:fLabs,datasets:[{label:'খরচ',data:fData,backgroundColor:fData.map((_,i)=>i===0?'#166534':'#4ade80'),borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'৳'+Math.round(v/100000)+'লা'}},x:{ticks:{autoSkip:false,maxRotation:30,font:{size:11}}}}}});
 
-  const configFactor = btype * quality * structure * cgrade * envFactor * (1 + foundation);
-  if(ef('config-factor')) ef('config-factor').value = configFactor.toFixed(3);
-
-  const baseCost = sqft * baseRate * configFactor;
-
-  // Materials
-  const mats = calcMaterials(sqft);
-  const matTotal = mats.reduce((s,m) => s+m.total, 0);
-  const tbody = document.getElementById('mat-tbody');
-  if(tbody) {
-    tbody.innerHTML = mats.map((m,i) => `<tr>
-      <td style="color:var(--text-muted)">${i+1}</td>
-      <td>${m.n}</td><td class="qty" style="color:var(--text-muted)">${m.qty.toLocaleString()}</td>
-      <td style="color:var(--text-muted)">${m.u}</td>
-      <td style="color:var(--text-muted)">৳ ${m.r.toLocaleString()}</td>
-      <td class="amt">৳ ${m.total.toLocaleString()}</td>
-    </tr>`).join('') + `<tr style="background:var(--bg);">
-      <td colspan="5" style="font-weight:700; color:var(--primary-dark); padding:8px 12px;">মোট</td>
-      <td class="amt" style="font-size:14px; color:var(--primary);">৳ ${matTotal.toLocaleString()}</td>
-    </tr>`;
-  }
-
-  // Labor
-  let laborTotal = 0, totalManday = 0;
-  laborData.forEach(l => { laborTotal += l.count*l.wage*l.days; totalManday += l.count*l.days; });
-  const craneHrs = +document.getElementById('crane-hrs').value||0;
-  const mixerDays = +document.getElementById('mixer-days').value||0;
-  const pumpDays = +document.getElementById('pump-days').value||0;
-  const vibDays = +document.getElementById('vib-days').value||0;
-  const equipTotal = craneHrs*3500+mixerDays*1800+pumpDays*8000+vibDays*500;
-  const totalLabor = laborTotal + equipTotal;
-  if(ef('equip-total')) ef('equip-total').textContent = '৳ '+Math.round(equipTotal).toLocaleString();
-  if(ef('total-manday')) ef('total-manday').textContent = Math.round(totalManday).toLocaleString();
-  const avgW = Math.max(1, Math.round(totalManday/120));
-  const estMonths = Math.max(1, Math.round(totalManday/avgW/25));
-  if(ef('est-months')) ef('est-months').textContent = estMonths+' মাস';
-  if(ef('construction-time')) ef('construction-time').textContent = estMonths+' মাস';
-  if(ef('manday-info')) ef('manday-info').textContent = 'ম্যান-ডে: '+Math.round(totalManday).toLocaleString();
-
-  // Extras
-  const solar = (+document.getElementById('solar-kw').value||0)*80000;
-  const gen = (+document.getElementById('gen-kva').value||0)*15000;
-  const boundary = (+document.getElementById('boundary').value||0)*600;
-  const interior = (+document.getElementById('interior').value||0)*sqft;
-  const tank = Math.round((+document.getElementById('tank').value||0)/1000)*12000;
-  const landscape = (+document.getElementById('landscape').value||0)*120;
-  const bedrooms = (+document.getElementById('bedrooms').value||0)*80000;
-  const doors = (+document.getElementById('doors').value||0)*12000;
-  const windows = (+document.getElementById('windows').value||0)*8000;
-  const bathrooms = (+document.getElementById('bathrooms').value||0)*60000;
-  const liftCost = lifts*2500000;
-  const extrasTotal = solar+gen+boundary+interior+tank+landscape+bedrooms+doors+windows+bathrooms+liftCost;
-
-  const specialTotal = getSpecialTotal();
-  const finishExtra = getFinishExtra();
-  if(ef('special-total')) ef('special-total').textContent = fmt(specialTotal);
-  if(ef('br-finish')) ef('br-finish').textContent = fmt(finishExtra);
-
-  // Govt fees
-  const rajukFee = sqft*floors*15+(floors>5?(floors-5)*sqft*5:0);
-  const wasaFee = 30000;
-  const elecFee = sqft>5000?150000:50000;
-  const gasFee = 40000+gasDist*800;
-  const regFee = landPrice*0.07;
-  const stampFee = landPrice*0.015;
-  const govtTotal = rajukFee+wasaFee+elecFee+gasFee+regFee+stampFee+5000;
-
-  if(ef('rajuk-fee')) ef('rajuk-fee').textContent = '৳ '+Math.round(rajukFee).toLocaleString();
-  if(ef('elec-fee')) ef('elec-fee').textContent = '৳ '+Math.round(elecFee).toLocaleString();
-  if(ef('gas-fee')) ef('gas-fee').textContent = '৳ '+Math.round(gasFee).toLocaleString();
-  if(ef('reg-fee')) ef('reg-fee').textContent = '৳ '+Math.round(regFee).toLocaleString();
-  if(ef('stamp-fee')) ef('stamp-fee').textContent = '৳ '+Math.round(stampFee).toLocaleString();
-  if(ef('total-govt')) ef('total-govt').textContent = '৳ '+Math.round(govtTotal).toLocaleString();
-
-  const subTotal = baseCost+totalLabor+extrasTotal+specialTotal+finishExtra;
-  const vatAmt = subTotal*vat/100;
-  const conAmt = subTotal*contingency/100;
-  const marAmt = subTotal*margin/100;
-  const infAmt = subTotal*inflation/100;
-  const chargesTotal = vatAmt+conAmt+marAmt+infAmt;
-  const grandTotal = subTotal+chargesTotal+govtTotal;
-  const perSqft = sqft>0 ? grandTotal/sqft : 0;
-  lastTotal = grandTotal;
-
-  if(ef('total-cost')) ef('total-cost').textContent = fmt(grandTotal);
-  if(ef('cost-per-sqft')) ef('cost-per-sqft').textContent = 'প্রতি sqft: '+fmt(perSqft);
-  if(ef('area-factor')) ef('area-factor').textContent = envFactor.toFixed(2);
-  if(ef('zone-info')) ef('zone-info').textContent = 'জোন: '+document.getElementById('seismic-zone').options[document.getElementById('seismic-zone').selectedIndex].text.split(' ')[0];
-  if(ef('govt-cost')) ef('govt-cost').textContent = fmt(govtTotal+chargesTotal);
-
-  // Score calculation
-  let score = 0;
-  if(sqft>0) score+=20;
-  if(document.getElementById('district').value) score+=15;
-  if(laborData.length>0) score+=15;
-  if(interior>0) score+=10;
-  if(solar>0) score+=10;
-  if(getSpecialTotal()>0) score+=10;
-  if(vat>0) score+=5;
-  if(landPrice>0) score+=5;
-  if(calcCount>5) score+=5;
-  if(calcCount>20) score+=5;
-  if(ef('project-score')) ef('project-score').textContent = score+'/১০০';
-  if(ef('score-label')) ef('score-label').textContent = score>=80?'চমৎকার! 🎉':score>=60?'ভালো! 👍':score>=40?'অগ্রগতি চলছে':'শুরু করুন';
-
-  // Breakdown
-  [{id:'br-base',v:baseCost},{id:'br-labor',v:totalLabor},{id:'br-extras',v:extrasTotal},
-   {id:'br-special',v:specialTotal},{id:'br-vat',v:chargesTotal},{id:'br-govt',v:govtTotal},{id:'br-total',v:grandTotal}
-  ].forEach(({id,v}) => { if(ef(id)) ef(id).textContent = fmt(v); });
-
-  updateCharts({base:baseCost,labor:totalLabor,extras:extrasTotal,special:specialTotal,finish:finishExtra,vat:chargesTotal,govt:govtTotal},floors,grandTotal);
-
-  // Badges check
-  checkBadges(grandTotal, sqft, floors, score);
-
-  // Labor rows update
-  renderLaborList();
+  const mats=calcMaterials(sqft);if(matChart)matChart.destroy();const mc=g('matChart');
+  if(mc)matChart=new Chart(mc,{type:'bar',data:{labels:mats.map(m=>m.name),datasets:[{data:mats.map(m=>m.total),backgroundColor:mats.map((_,i)=>C[i%C.length]),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'৳'+Math.round(v/1000)+'হা'}},x:{ticks:{autoSkip:false,maxRotation:35,font:{size:10}}}}}});
 }
 
-// Charts
-function updateCharts(b, floors, total) {
-  const colors = ['#1a6b3a','#e8a020','#3b82f6','#ef4444','#8b5cf6','#14b8a6','#f97316'];
-  const labels = ['মূল নির্মাণ','শ্রমিক ও যন্ত্র','অতিরিক্ত','স্পেশাল','তলা ফিনিশিং','ভ্যাট ও চার্জ','সরকারি ফি'];
-  const vals = [b.base,b.labor,b.extras,b.special,b.finish||0,b.vat,b.govt];
+// MAIN RECALCULATE
+function recalculate(){
+  const sqft=Math.max(0,+(g('total-area')?.value||0));
+  const floors=Math.max(1,+(g('floors')?.value||1));
+  const baseRate=Math.max(0,+(g('base-rate')?.value||2200));
+  const bF=getBuildingFactor();
+  const qual=Math.max(0,+(g('quality')?.value||1));
+  const struct=Math.max(0,+(g('structure')?.value||1));
+  const found=Math.max(0,+(g('foundation')?.value||0.10));
+  const conc=Math.max(1,+(g('concrete-grade')?.value||1.08));
+  const areaT=Math.max(0,+(g('area-type')?.value||1));
+  const seismic=Math.max(1,+(g('seismic-zone')?.value||1.05));
+  const flood=Math.max(1,+(g('flood-risk')?.value||1.08));
+  const spEnv=Math.max(1,+(g('special-env')?.value||1));
+  const lifts=Math.max(0,+(g('lifts')?.value||0));
+  const vat=Math.max(0,+(g('vat')?.value||15));
+  const cont=Math.max(0,+(g('contingency')?.value||5));
+  const marg=Math.max(0,+(g('margin')?.value||10));
+  const infl=Math.max(0,+(g('inflation')?.value||3));
+  const landP=Math.max(0,+(g('land-price')?.value||0));
+  const gasDist=Math.max(0,+(g('gas-dist')?.value||0));
 
-  // Donut
-  if(donutChartObj) donutChartObj.destroy();
-  const dc = document.getElementById('donutChart');
-  if(dc) {
-    donutChartObj = new Chart(dc, {type:'doughnut', data:{labels, datasets:[{data:vals, backgroundColor:colors, borderWidth:2, borderColor:document.documentElement.getAttribute('data-theme')==='dark'?'#162a1c':'#fff'}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}});
-    const leg = document.getElementById('donut-legend');
-    if(leg) leg.innerHTML = labels.map((l,i) => `<span style="display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:2px;background:${colors[i]};display:inline-block;"></span>${l} ${total>0?Math.round(vals[i]/total*100):0}%</span>`).join('');
-  }
+  // ENV FACTORS
+  const envF=areaT*seismic*flood*spEnv;
+  s('ef1',areaT.toFixed(2));s('ef2',seismic.toFixed(2));s('ef3',flood.toFixed(2));s('ef4',spEnv.toFixed(2));s('ef-total',envF.toFixed(3));
 
-  // Floor chart
-  if(floorChartObj) floorChartObj.destroy();
-  const fc = document.getElementById('floorChart');
-  if(fc) {
-    const fLabels = [], fData = [];
-    const bpc = b.base/floors;
-    for(let i=1;i<=Math.min(floors,12);i++) { fLabels.push(i===0?'নিচতলা':i+' তলা'); fData.push(Math.round(bpc*(i===1?1.15:i<=3?1.0:0.92))); }
-    floorChartObj = new Chart(fc, {type:'bar', data:{labels:fLabels, datasets:[{label:'খরচ (৳)',data:fData,backgroundColor:'#2d9653',borderRadius:5}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'৳'+Math.round(v/100000)+'লা'}},x:{ticks:{autoSkip:false}}}}});
-  }
+  // CONFIG FACTOR
+  const configF=bF*qual*struct*conc*envF*(1+found);
+  const baseCost=sqft*baseRate*configF;
+  s('bldg-factor-d',bF.toFixed(2));s('qs-factor-d',(qual*struct).toFixed(2));s('config-factor-d',configF.toFixed(3));s('base-cost-d',fmt(baseCost));
 
-  // Material chart
-  if(matChartObj) matChartObj.destroy();
-  const mc = document.getElementById('matChart');
-  if(mc) {
-    const mats = calcMaterials(+document.getElementById('total-area').value||2000);
-    matChartObj = new Chart(mc, {type:'bar', data:{labels:mats.map(m=>m.n), datasets:[{label:'৳',data:mats.map(m=>m.total),backgroundColor:colors,borderRadius:4}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'৳'+Math.round(v/1000)+'হা'}},x:{ticks:{autoSkip:false,maxRotation:30}}}}});
-  }
-}
+  // MATERIALS
+  const mats=calcMaterials(sqft);
+  const tb=g('mat-tbody');
+  if(tb)tb.innerHTML=mats.map(m=>`<tr><td style="padding-left:22px">${m.name}</td><td class="mat-qty">${m.qty.toLocaleString()}</td><td>${m.unit}</td><td>৳ ${m.rate.toLocaleString()}</td><td class="mat-amount" style="padding-right:22px">৳ ${m.total.toLocaleString()}</td></tr>`).join('')+`<tr class="mat-total-row"><td colspan="4" style="padding-left:22px;font-weight:700;color:var(--green-800)">মোট ম্যাটেরিয়াল খরচ</td><td class="mat-amount" style="padding-right:22px;color:var(--green-700)">৳ ${mats.reduce((s,m)=>s+m.total,0).toLocaleString()}</td></tr>`;
 
-// BOQ
-function renderBOQ() {
-  const sqft = +document.getElementById('total-area').value||0;
-  const mats = calcMaterials(sqft);
-  const floors = +document.getElementById('floors').value||1;
-  const cont = document.getElementById('boq-container');
-  if(!cont) return;
-  const grandTotal = lastTotal;
-  let html = `<table class="boq-table"><thead><tr><th>#</th><th>বিবরণ</th><th>পরিমাণ</th><th>একক</th><th>একক দর (৳)</th><th>মোট (৳)</th></tr></thead><tbody>`;
-  html += `<tr class="section-row"><td colspan="6">ক) ম্যাটেরিয়াল</td></tr>`;
-  mats.forEach((m,i) => { html += `<tr><td>${i+1}</td><td>${m.n}</td><td>${m.qty.toLocaleString()}</td><td>${m.u}</td><td>${m.r.toLocaleString()}</td><td style="text-align:right; font-weight:600;">৳ ${m.total.toLocaleString()}</td></tr>`; });
-  html += `<tr class="section-row"><td colspan="6">খ) শ্রমিক ও যন্ত্রপাতি</td></tr>`;
-  let lnum = mats.length+1;
-  laborData.forEach(l => { html += `<tr><td>${lnum++}</td><td>${l.name}</td><td>${l.count} জন × ${l.days} দিন</td><td>মজুরি</td><td>${l.wage.toLocaleString()}</td><td style="text-align:right; font-weight:600;">৳ ${(l.count*l.wage*l.days).toLocaleString()}</td></tr>`; });
-  html += `<tr class="section-row"><td colspan="6">গ) অতিরিক্ত সুবিধা</td></tr>`;
-  const lifts = +document.getElementById('lifts').value||0;
-  if(lifts>0) html += `<tr><td>${lnum++}</td><td>লিফট</td><td>${lifts} টি</td><td>সেট</td><td>২৫,০০,০০০</td><td style="text-align:right; font-weight:600;">৳ ${(lifts*2500000).toLocaleString()}</td></tr>`;
-  const solar = +document.getElementById('solar-kw').value||0;
-  if(solar>0) html += `<tr><td>${lnum++}</td><td>সোলার প্যানেল</td><td>${solar} kW</td><td>kW</td><td>৮০,০০০</td><td style="text-align:right; font-weight:600;">৳ ${(solar*80000).toLocaleString()}</td></tr>`;
-  const sp = getSpecialTotal();
-  if(sp>0) html += `<tr><td>${lnum++}</td><td>স্পেশাল ফিচারস (সমষ্টি)</td><td>—</td><td>—</td><td>—</td><td style="text-align:right; font-weight:600;">৳ ${sp.toLocaleString()}</td></tr>`;
-  html += `<tr class="total-row"><td colspan="5">সর্বমোট নির্মাণ ব্যয়</td><td style="text-align:right;">৳ ${Math.round(grandTotal).toLocaleString()}</td></tr>`;
-  html += `</tbody></table>`;
-  cont.innerHTML = html;
-}
+  // LABOR — REAL TIMELINE LOGIC
+  let laborCost=0,totalMD=0,totalWorkers=0;
+  laborData.forEach(l=>{laborCost+=l.count*l.wage*l.days;totalMD+=l.count*l.days;totalWorkers+=l.count;});
+  const craneH=Math.max(0,+(g('crane-hrs')?.value||0));const mixD=Math.max(0,+(g('mixer-days')?.value||0));
+  const pumpD=Math.max(0,+(g('pump-days')?.value||0));const vibD=Math.max(0,+(g('vib-days')?.value||0));
+  const scaffD=Math.max(0,+(g('scaffold-days')?.value||0));const dewD=Math.max(0,+(g('dewater-days')?.value||0));
+  const equipCost=craneH*3500+mixD*1800+pumpD*8000+vibD*500+scaffD*2000+dewD*1500;
+  const totalLabor=laborCost+equipCost;
 
-function exportBOQ() {
-  const sqft = +document.getElementById('total-area').value||0;
-  const mats = calcMaterials(sqft);
-  const rows = [['ক্রম','বিবরণ','পরিমাণ','একক','দর (৳)','মোট (৳)']];
-  mats.forEach((m,i) => rows.push([i+1,m.n,m.qty,m.u,m.r,m.total]));
-  laborData.forEach((l,i) => rows.push([mats.length+i+1,l.name,l.count+'জন×'+l.days+'দিন','মজুরি',l.wage,l.count*l.wage*l.days]));
-  const csv = rows.map(r => r.join(',')).join('\n');
-  const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'BOQ_nirman.csv'; a.click();
-}
-function printBOQ() { window.print(); }
+  // Timeline: workDays = totalMD / totalWorkers; months = workDays / 25
+  const avgWorkers=Math.max(1,Math.round(totalWorkers));
+  const workDays=totalMD>0?Math.ceil(totalMD/Math.max(1,avgWorkers)):30;
+  const estMonths=Math.max(1,Math.ceil(workDays/25));
+  const pct=Math.min(100,(estMonths/36)*100);
 
-// Contract
-function renderMilestones() {
-  const cont = document.getElementById('milestone-list');
-  if(!cont) return;
-  const total = lastTotal;
-  cont.innerHTML = milestones.map((m,i) => {
-    const amt = Math.round(total*m.pct/100);
-    return `<div class="milestone-row">
-      <input type="text" value="${m.name}" onchange="milestones[${i}].name=this.value">
-      <span style="font-weight:700; color:var(--primary-dark);">৳ ${amt.toLocaleString()} (${m.pct}%)</span>
-      <input type="text" value="${m.date}" placeholder="তারিখ" onchange="milestones[${i}].date=this.value">
-      <select onchange="milestones[${i}].status=this.value; renderMilestones()">
-        <option value="pending" ${m.status==='pending'?'selected':''}>অপেক্ষমান</option>
-        <option value="ongoing" ${m.status==='ongoing'?'selected':''}>চলমান</option>
-        <option value="done" ${m.status==='done'?'selected':''}>সম্পন্ন</option>
-      </select>
-    </div>`;
-  }).join('');
-  const smry = document.getElementById('contract-summary');
-  if(smry) {
-    const paid = milestones.filter(m=>m.status==='done').reduce((s,m)=>s+m.pct,0);
-    smry.style.display='block';
-    smry.innerHTML = `পরিশোধিত: <strong>${paid}%</strong> | অপেক্ষমান: <strong>${100-paid}%</strong> | মোট চুক্তি: <strong>৳ ${Math.round(lastTotal).toLocaleString()}</strong>`;
-  }
-}
-function addMilestone() {
-  milestones.push({name:'নতুন মাইলস্টোন',pct:5,date:'',status:'pending'});
-  renderMilestones();
-}
-function generateContract() {
-  const cn = document.getElementById('contractor-name').value||'[ঠিকাদারের নাম]';
-  const cd = document.getElementById('contract-date').value||'[তারিখ]';
-  const total = Math.round(lastTotal);
-  const area = document.getElementById('total-area').value;
-  alert(`চুক্তিপত্র তৈরি হয়েছে!\n\nঠিকাদার: ${cn}\nতারিখ: ${cd}\nমোট চুক্তিমূল্য: ৳ ${total.toLocaleString()}\nনির্মাণ আয়তন: ${area} sqft\n\n(সম্পূর্ণ চুক্তিপত্রের জন্য PDF ডাউনলোড করুন)`);
-}
+  // Impact indicators — show change
+  const mdChange=totalMD>prevManday?'↑ শ্রমিক বাড়লে সময় কমে':'↓ শ্রমিক কমলে সময় বাড়ে';
+  const lcChange=totalLabor>prevLaborCost?'↑ খরচ বেড়েছে':'↓ খরচ কমেছে';
+  s('total-manday',totalMD.toLocaleString());s('est-months',estMonths+' মাস');s('labor-total-d',fmt(totalLabor));
+  s('md-change',prevManday>0?mdChange:'—');s('lc-change',prevLaborCost>0?lcChange:'—');
+  if(g('md-change'))g('md-change').className='impact-change '+(totalMD>=prevManday?'ic-up':'ic-down');
+  prevManday=totalMD;prevLaborCost=totalLabor;
 
-// AI
-async function sendAI() {
-  const input = document.getElementById('ai-input');
-  const msg = input.value.trim();
-  if(!msg) return;
-  input.value = '';
-  addAIMsg(msg, 'user');
-  addAIMsg('বিশ্লেষণ করছি...', 'bot typing');
-  const context = `আপনি একজন বাংলাদেশের নির্মাণ বিশেষজ্ঞ। প্রজেক্টের তথ্য: আয়তন=${document.getElementById('total-area').value} sqft, তলা=${document.getElementById('floors').value}, মান=${document.getElementById('quality').options[document.getElementById('quality').selectedIndex].text}, এলাকা=${document.getElementById('district').value||'অজ্ঞাত'}, মোট খরচ=৳${Math.round(lastTotal).toLocaleString()}। বাংলায় সংক্ষিপ্ত ও বাস্তবসম্মত পরামর্শ দিন।`;
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:1000, messages:[{role:'user',content:`${context}\n\nপ্রশ্ন: ${msg}`}]})
-    });
-    const data = await res.json();
-    const reply = data.content?.[0]?.text || 'দুঃখিত, উত্তর পেতে সমস্যা হয়েছে।';
-    removeTyping();
-    addAIMsg(reply, 'bot');
-  } catch(e) {
-    removeTyping();
-    addAIMsg(`প্রজেক্টের ডেটা বিশ্লেষণ করে পরামর্শ:\n\n• আয়তন ${document.getElementById('total-area').value} sqft এর জন্য M20 কংক্রিট ও Fe500 রড সুপারিশ করা হচ্ছে\n• খরচ কমাতে: বালি ও পাথর স্থানীয় উৎস থেকে সংগ্রহ করুন (১৫-২০% সাশ্রয়)\n• শ্রমিক মজুরিতে ১০-১৫% সঞ্চয় করতে মৌসুমী শ্রমিক ব্যবহার করুন\n• পাইল ফাউন্ডেশন ব্যবহার করলে দীর্ঘমেয়াদে নিরাপদ ও সাশ্রয়ী`, 'bot');
-  }
-}
-function addAIMsg(text, type) {
-  const msgs = document.getElementById('ai-messages');
-  if(!msgs) return;
-  const div = document.createElement('div');
-  div.className = 'ai-msg '+type;
-  div.textContent = text;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-function removeTyping() {
-  const msgs = document.getElementById('ai-messages');
-  if(!msgs) return;
-  const typing = msgs.querySelector('.typing');
-  if(typing) typing.remove();
-}
-function quickAI(msg) {
-  document.getElementById('ai-input').value = msg;
-  sendAI();
-}
+  s('labor-grand','৳ '+Math.round(laborCost).toLocaleString());
+  s('equip-total','৳ '+Math.round(equipCost).toLocaleString());
+  s('avg-workers',avgWorkers+' জন');s('timeline-months',estMonths+' মাস');
+  s('total-manday',totalMD.toLocaleString());
+  if(g('timeline-fill'))g('timeline-fill').style.width=pct+'%';
+  // Milestones
+  s('m1',Math.ceil(estMonths*0.20)+' মাস');s('m2',Math.ceil(estMonths*0.40)+' মাস');
+  s('m3',Math.ceil(estMonths*0.70)+' মাস');s('m4',estMonths+' মাস');
+  const tip=avgWorkers>15?'⚡ শ্রমিক বেশি — নির্মাণ দ্রুত হবে':avgWorkers<5?'⚠️ শ্রমিক কম — সময় বেশি লাগবে, আরও যোগ করুন':'✅ শ্রমিক সংখ্যা মাঝারি — সুষম গতি';
+  s('timeline-tip',tip);
 
-// Price trend
-function showPriceChart(material, el) {
-  document.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'));
-  if(el) el.classList.add('active');
-  if(priceChartObj) priceChartObj.destroy();
-  const pc = document.getElementById('priceChart');
-  if(!pc) return;
-  const data = priceHistory[material];
-  const labels = {rod:'রড (৳/kg)',cement:'সিমেন্ট (৳/বস্তা)',brick:'ইট (৳/হাজার)',sand:'বালি (৳/cft)'};
-  priceChartObj = new Chart(pc, {type:'line', data:{labels:months, datasets:[{label:labels[material],data,borderColor:'#1a6b3a',backgroundColor:'rgba(26,107,58,0.08)',fill:true,tension:0.4,pointBackgroundColor:'#1a6b3a',pointRadius:4}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'৳'+v}}}}});
-  // Forecast
-  const last3 = data.slice(-3);
-  const trend = (last3[2]-last3[0])/2;
-  const forecast = data[data.length-1] + trend*3;
-  const pf = document.getElementById('price-forecast');
-  if(pf) pf.innerHTML = `📈 <strong>৩ মাসের পূর্বাভাস:</strong> ${labels[material].split(' ')[0]} মূল্য আনুমানিক ৳ ${Math.round(forecast)} হতে পারে। ${trend>0?'▲ বৃদ্ধির প্রবণতা — এখনই কিনুন বিবেচনা করুন।':'▼ হ্রাসের প্রবণতা — কিছুদিন অপেক্ষা করুন।'}`;
+  // EXTRAS
+  const interior=Math.max(0,+(g('interior')?.value||0))*sqft;
+  const tank=Math.ceil(Math.max(0,+(g('tank')?.value||0))/1000)*12000;
+  const bedC=Math.max(0,+(g('bedrooms')?.value||0))*80000;
+  const bathC=Math.max(0,+(g('bathrooms')?.value||0))*60000;
+  const doorC=Math.max(0,+(g('doors')?.value||0))*12000;
+  const winC=Math.max(0,+(g('windows')?.value||0))*8000;
+  const kitC=Math.max(0,+(g('kitchen')?.value||0));
+  const acC=Math.max(0,+(g('ac-tons')?.value||0))*70000;
+  const smartH=Math.max(0,+(g('smart-home')?.value||0));
+  const vdoor=Math.max(0,+(g('video-doorbell')?.value||0))*15000;
+  const slockC=Math.max(0,+(g('smart-lock')?.value||0))*20000;
+  const autoL=Math.max(0,+(g('auto-light')?.value||0))*5000;
+  const homeT=Math.max(0,+(g('home-theater')?.value||0));
+  const intercomC=Math.max(0,+(g('intercom')?.value||0))*25000;
+  const bmsC=Math.max(0,+(g('bms')?.value||0));
+  const smeterC=Math.max(0,+(g('smart-meter')?.value||0));
+  const solarKw=Math.max(0,+(g('solar-kw')?.value||0))*80000;
+  const battKwh=Math.max(0,+(g('battery-kwh')?.value||0))*60000;
+  const solarHeat=Math.max(0,+(g('solar-heater')?.value||0))/100*15000;
+  const rainW=Math.max(0,+(g('rainwater')?.value||0))/10000*80000;
+  const dblGlz=Math.max(0,+(g('double-glaze')?.value||0))*800;
+  const greenRf=Math.max(0,+(g('green-roof')?.value||0))*400;
+  const greyW=Math.max(0,+(g('greywater')?.value||0));
+  const insul=Math.max(0,+(g('insulation')?.value||0))*350;
+  const cctvC=Math.max(0,+(g('cctv-ch')?.value||0))*5000+20000*(+(g('cctv-ch')?.value||0)>0?1:0);
+  const accessC=Math.max(0,+(g('access-ctrl')?.value||0))*30000;
+  const fireAlm=Math.max(0,+(g('fire-alarm')?.value||0))*3000;
+  const sprinkC=Math.max(0,+(g('sprinkler')?.value||0))*8000;
+  const extingC=Math.max(0,+(g('extinguisher')?.value||0))*5000;
+  const intruC=Math.max(0,+(g('intruder')?.value||0))*15000;
+  const fencC=Math.max(0,+(g('fencing')?.value||0))*450;
+  const guardC=Math.max(0,+(g('guard-room')?.value||0))*80000;
+  const genC=Math.max(0,+(g('gen-kva')?.value||0))*15000;
+  const upsC=Math.max(0,+(g('ups-kva')?.value||0))*20000;
+  const pumpHpC=Math.max(0,+(g('pump-hp')?.value||0))*25000;
+  const softC=Math.max(0,+(g('softener')?.value||0))*80000;
+  const lanC=Math.max(0,+(g('lan-pts')?.value||0))*3500;
+  const vacC=Math.max(0,+(g('vacuum-pts')?.value||0))*15000;
+  const dumbwC=Math.max(0,+(g('dumbwaiter')?.value||0))*200000;
+  const centralAcC=Math.max(0,+(g('central-ac')?.value||0))*150000;
+  const boundC=Math.max(0,+(g('boundary')?.value||0))*600;
+  const landscC=Math.max(0,+(g('landscape')?.value||0))*120;
+  const poolC=Math.max(0,+(g('pool-sqft')?.value||0))*5000;
+  const outParkC=Math.max(0,+(g('outdoor-parking')?.value||0))*80000;
+  const drivC=Math.max(0,+(g('driveway')?.value||0))*250;
+  const roofGC=Math.max(0,+(g('roof-garden')?.value||0))*350;
+  const fountC=Math.max(0,+(g('fountain')?.value||0))*150000;
+  const pergC=Math.max(0,+(g('pergola')?.value||0))*600;
+  const liftCost=lifts*2500000;
+
+  const extrasTotal=interior+tank+bedC+bathC+doorC+winC+kitC+acC+smartH+vdoor+slockC+autoL+homeT+intercomC+bmsC+smeterC+solarKw+battKwh+solarHeat+rainW+dblGlz+greenRf+greyW+insul+cctvC+accessC+fireAlm+sprinkC+extingC+intruC+fencC+guardC+genC+upsC+pumpHpC+softC+lanC+vacC+dumbwC+centralAcC+boundC+landscC+poolC+outParkC+drivC+roofGC+fountC+pergC+liftCost;
+  s('extras-total-d',fmt(extrasTotal));
+
+  // SPECIAL
+  const specialTotal=getSpecialTotal();s('special-total',fmt(specialTotal));
+
+  // GOVT FEES
+  const rajukFee=sqft*floors*16+(floors>5?(floors-5)*sqft*6:0);
+  const wasaFee=30000;const elecFee=sqft>5000?180000:60000;
+  const gasFee=40000+gasDist*800;const regFee=landP*0.07;const stampFee=landP*0.015;
+  const ecoFee=(['hospital','hotel3','hotel5','resort','factory','garments','food_proc','pharma'].includes(g('bldg-type').value))?100000:0;
+  const govtTotal=rajukFee+wasaFee+elecFee+gasFee+regFee+stampFee+ecoFee+5000;
+  s('rajuk-fee','৳ '+Math.round(rajukFee).toLocaleString());s('wasa-fee','৳ '+Math.round(wasaFee).toLocaleString());
+  s('elec-fee','৳ '+Math.round(elecFee).toLocaleString());s('gas-fee','৳ '+Math.round(gasFee).toLocaleString());
+  s('reg-fee','৳ '+Math.round(regFee).toLocaleString());s('stamp-fee','৳ '+Math.round(stampFee).toLocaleString());
+  s('eco-fee','৳ '+Math.round(ecoFee).toLocaleString());s('total-govt','৳ '+Math.round(govtTotal).toLocaleString());
+
+  // FINANCIAL
+  const sub=baseCost+totalLabor+extrasTotal+specialTotal;
+  const vatA=sub*vat/100;const conA=sub*cont/100;const marA=sub*marg/100;const infA=sub*infl/100;
+  const charges=vatA+conA+marA+infA;
+  const grand=sub+charges+govtTotal;const perSqft=sqft>0?grand/sqft:0;
+
+  // TOP BAR
+  s('total-cost',fmt(grand));s('cost-per-sqft','প্রতি sqft: '+fmt(perSqft));
+  s('construction-time',estMonths+' মাস');s('manday-info','ম্যান-ডে: '+totalMD.toLocaleString());
+  s('area-factor',envF.toFixed(2));
+  const szEl=g('seismic-zone');s('zone-info','জোন: '+(szEl?szEl.options[szEl.selectedIndex].text.split(' ')[0]:'—'));
+  s('govt-cost',fmt(govtTotal+charges));
+
+  // BREAKDOWN
+  s('br-base',fmt(baseCost));s('br-labor',fmt(totalLabor));s('br-extras',fmt(extrasTotal));
+  s('br-special',fmt(specialTotal));s('br-vat',fmt(charges));s('br-govt',fmt(govtTotal));s('br-total',fmt(grand));
+
+  // REPORT
+  const rdb=g('detailed-breakdown');
+  if(rdb)rdb.innerHTML=`<div class="breakdown-row"><span class="br-label">বেস নির্মাণ (${sqft.toLocaleString()} sqft × ৳${baseRate} × ${configF.toFixed(2)})</span><span class="br-val">${fmt(baseCost)}</span></div><div class="breakdown-row"><span class="br-label">শ্রমিক মজুরি</span><span class="br-val">${fmt(laborCost)}</span></div><div class="breakdown-row"><span class="br-label">যন্ত্রপাতি ভাড়া</span><span class="br-val">${fmt(equipCost)}</span></div><div class="breakdown-row"><span class="br-label">লিফট (${lifts}টি)</span><span class="br-val">${fmt(liftCost)}</span></div><div class="breakdown-row"><span class="br-label">ইন্টেরিয়র ডিজাইন</span><span class="br-val">${fmt(interior)}</span></div><div class="breakdown-row"><span class="br-label">সোলার + ব্যাটারি + গ্রীন</span><span class="br-val">${fmt(solarKw+battKwh+solarHeat+greenRf+greyW+insul)}</span></div><div class="breakdown-row"><span class="br-label">নিরাপত্তা সিস্টেম</span><span class="br-val">${fmt(cctvC+accessC+fireAlm+sprinkC+extingC+intruC+guardC)}</span></div><div class="breakdown-row"><span class="br-label">স্মার্ট ও ইউটিলিটি</span><span class="br-val">${fmt(smartH+bmsC+genC+upsC+centralAcC)}</span></div><div class="breakdown-row"><span class="br-label">আউটডোর ও ল্যান্ডস্কেপ</span><span class="br-val">${fmt(boundC+landscC+poolC+drivC+roofGC+fountC+pergC)}</span></div><div class="breakdown-row"><span class="br-label">স্পেশাল ফিচারস</span><span class="br-val">${fmt(specialTotal)}</span></div><div class="breakdown-row"><span class="br-label">ভ্যাট ${vat}% + কন্টিনজেন্সি ${cont}%</span><span class="br-val">${fmt(vatA+conA)}</span></div><div class="breakdown-row"><span class="br-label">কন্ট্রাক্টর মার্জিন ${marg}% + মুদ্রাস্ফীতি ${infl}%</span><span class="br-val">${fmt(marA+infA)}</span></div><div class="breakdown-row"><span class="br-label">সরকারি ও আইনি ফি</span><span class="br-val">${fmt(govtTotal)}</span></div><div class="breakdown-row breakdown-total"><span class="br-label">সর্বমোট নির্মাণ ব্যয়</span><span class="br-val">${fmt(grand)}</span></div><div style="margin-top:8px;font-size:12px;color:var(--text-muted)">প্রতি বর্গফুট গড় ব্যয়: <strong style="color:var(--green-700)">${fmt(perSqft)}</strong></div>`;
+
+  const rm=g('report-meta');if(rm)rm.textContent='তারিখ: '+new Date().toLocaleDateString('bn-BD')+' | জেলা: '+(g('district')?.value||'নির্বাচিত নয়')+' | বিল্ডিং: '+(g('bldg-type')?.options[g('bldg-type')?.selectedIndex]?.text.split(' ×')[0]||'—');
+  const rp=g('report-pills');if(rp)rp.innerHTML=`<div class="r-pill">📐 ${sqft.toLocaleString()} sqft</div><div class="r-pill">🏢 ${floors} তলা</div><div class="r-pill">⏱️ ${estMonths} মাস</div><div class="r-pill">👷 ${avgWorkers} জন/দিন</div><div class="r-pill">💰 ${fmt(grand)}</div>`;
+
+  updateCharts({base:baseCost,labor:totalLabor,extras:extrasTotal,special:specialTotal,vat:charges,govt:govtTotal},sqft,floors,baseCost);
+  calcLoan();calcSolarROI();
 }
 
-// Weather
-function calcWeatherDelay() {
-  const month = +document.getElementById('start-month').value||1;
-  const estMonths = +((document.getElementById('est-months')||{}).textContent||'6').replace(' মাস','');
-  let rainyMonths = 0, cycloneRisk = false;
-  for(let i=0;i<estMonths;i++) {
-    const m = ((month-1+i)%12)+1;
-    if(m>=6 && m<=9) rainyMonths++;
-    if(m===5||m===10||m===11) cycloneRisk = true;
-  }
-  const delayDays = rainyMonths * 8;
-  const wa = document.getElementById('weather-analysis');
-  if(!wa) return;
-  wa.innerHTML = `<div class="alert ${rainyMonths>2?'alert-warning':'alert-success'}">
-    🌧️ বর্ষা মৌসুম: <strong>${rainyMonths} মাস</strong> পড়বে | আনুমানিক বিলম্ব: <strong>${delayDays} দিন (${Math.round(delayDays/30)} মাস)</strong><br>
-    ${cycloneRisk?'⚠️ সাইক্লোন ঝুঁকির সময় নির্মাণ চলবে — বিশেষ সতর্কতা প্রয়োজন।':'✅ সাইক্লোন ঝুঁকির সময় নির্মাণ নেই।'}<br>
-    মোট আনুমানিক সময় (বিলম্বসহ): <strong>${estMonths} + ${Math.round(delayDays/30)} = ${estMonths+Math.round(delayDays/30)} মাস</strong>
-  </div>`;
-}
-function renderWorkdayChart() {
-  if(workdayChartObj) workdayChartObj.destroy();
-  const wc = document.getElementById('workdayChart');
-  if(!wc) return;
-  workdayChartObj = new Chart(wc, {type:'bar', data:{labels:months, datasets:[{label:'কার্যকর কর্মদিন',data:workdays,backgroundColor:workdays.map(d=>d<22?'#f59e0b':'#1a6b3a'),borderRadius:4}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:15,max:27,ticks:{callback:v=>v+' দিন'}}}}});
+// NAVIGATION
+const TITLES={location:['লোকেশন ও পরিবেশ','এলাকা নির্বাচন — কস্ট ফ্যাক্টর স্বয়ংক্রিয়ভাবে প্রযোজ্য হবে'],building:['বিল্ডিং কনফিগারেশন','বিল্ডিং ধরণ, মান ও আয়তন নির্ধারণ করুন'],materials:['ম্যাটেরিয়াল টেকঅফ','স্বয়ংক্রিয় গণনা — BNBC + রাজউক CWR'],labor:['শ্রমিক ও টাইমলাইন','শ্রমিক পরিবর্তনে নির্মাণ সময় রিয়েল-টাইমে আপডেট হয়'],extras:['অতিরিক্ত সুবিধা (৫০+)','সোলার, স্মার্ট, গ্রীন, নিরাপত্তা, ইউটিলিটি, আউটডোর'],financial:['আর্থিক ও সরকারি ফি','ভ্যাট, রাজউক, ওয়াসা, ঋণ হিসাব'],special:['স্পেশাল ফিচারস (৫০+)','বিল্ডিং ধরণ অনুযায়ী বিশেষ সুবিধাসমূহ'],laws:['বাংলাদেশ নির্মাণ আইন','BNBC 2020 | রাজউক | পরিবেশ | শ্রম আইন'],report:['রিপোর্ট ও বিশ্লেষণ','সম্পূর্ণ নির্মাণ ব্যয় বিশ্লেষণ ও চার্ট']};
+function showSection(name){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const sec=g('section-'+name);if(sec)sec.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')===`showSection('${name}')`)n.classList.add('active');});
+  const t=TITLES[name];if(t){s('page-title',t[0]);s('page-sub',t[1]);}
+  closeSidebar();recalculate();
 }
 
-// Checklist
-let checkDone = 0, checkTotal = 0;
-function renderChecklist() {
-  const phases = Object.keys(checklist);
-  const tabs = document.getElementById('checklist-phase-tabs');
-  const cont = document.getElementById('checklist-container');
-  if(!tabs||!cont) return;
-  tabs.innerHTML = phases.map((p,i) => `<button class="inner-tab ${i===0?'active':''}" onclick="showCheckPhase('${p}', this)">${p}</button>`).join('');
-  checkTotal = phases.reduce((s,p)=>s+checklist[p].length,0);
-  if(document.getElementById('checklist-total')) document.getElementById('checklist-total').textContent = checkTotal;
-  showCheckPhase(phases[0], tabs.querySelector('.inner-tab'));
+// PROJECT SAVE / LOAD
+function collectState(){
+  const nums=['total-area','floors','base-rate','lifts','gas-dist','solar-kw','battery-kwh','solar-heater','rainwater','double-glaze','green-roof','insulation','cctv-ch','access-ctrl','fire-alarm','sprinkler','extinguisher','intruder','fencing','guard-room','gen-kva','ups-kva','pump-hp','softener','lan-pts','vacuum-pts','dumbwaiter','central-ac','boundary','landscape','pool-sqft','outdoor-parking','driveway','roof-garden','fountain','pergola','bedrooms','bathrooms','doors','windows','ac-tons','video-doorbell','smart-lock','auto-light','intercom','vat','contingency','margin','inflation','land-price','crane-hrs','mixer-days','pump-days','vib-days','scaffold-days','dewater-days','loan-amt','loan-rate','loan-years','monthly-bill'];
+  const sels=['division','district','upazila','area-type','city-corp','seismic-zone','flood-risk','special-env','bldg-cat','bldg-type','quality','structure','concrete-grade','foundation','interior','kitchen','smart-home','home-theater','bms','smart-meter','greywater','solar-pct'];
+  const st={};nums.forEach(id=>{const el=g(id);if(el)st[id]=el.value;});sels.forEach(id=>{const el=g(id);if(el)st[id]=el.value;});
+  st.laborData=JSON.parse(JSON.stringify(laborData));st.savedAt=new Date().toISOString();
+  st.name='প্রজেক্ট — '+(g('district')?.value||'অজানা')+' ('+new Date().toLocaleDateString('bn-BD')+')';
+  return st;
 }
-function showCheckPhase(phase, el) {
-  document.querySelectorAll('#checklist-phase-tabs .inner-tab').forEach(t => t.classList.remove('active'));
-  if(el) el.classList.add('active');
-  const cont = document.getElementById('checklist-container');
-  if(!cont) return;
-  cont.innerHTML = checklist[phase].map((item,i) => {
-    const key = phase+'-'+i;
-    const done = !!checklistState[key];
-    return `<div class="checklist-item ${done?'done':''}" id="cl-${key}">
-      <input type="checkbox" ${done?'checked':''} onchange="toggleCheck('${key}', this.checked)">
-      <div>
-        <div class="checklist-label ${done?'done-text':''}">${item.t}</div>
-        <div class="checklist-phase">${phase} পর্যায়</div>
-      </div>
-    </div>`;
-  }).join('');
-  updateCheckProgress();
+function saveProject(){
+  const st=collectState();const name=prompt('প্রজেক্টের নাম:',st.name)||st.name;st.name=name;
+  try{const arr=JSON.parse(localStorage.getItem('nirman-v3')||'[]');arr.unshift(st);if(arr.length>20)arr.pop();localStorage.setItem('nirman-v3',JSON.stringify(arr));alert('✅ "'+name+'" সেভ হয়েছে!');}catch(e){alert('সেভ ব্যর্থ।');}
 }
-function toggleCheck(key, done) {
-  checklistState[key] = done;
-  const item = document.getElementById('cl-'+key);
-  if(item) { item.classList.toggle('done', done); item.querySelector('.checklist-label').classList.toggle('done-text', done); }
-  updateCheckProgress();
+function openLoadModal(){
+  try{const arr=JSON.parse(localStorage.getItem('nirman-v3')||'[]');const pl=g('projects-list');
+    if(!arr.length){pl.innerHTML='<p style="color:var(--text-muted);font-size:13px">কোনো সেভ করা প্রজেক্ট নেই।</p>';}
+    else{pl.innerHTML=arr.map((p,i)=>`<div class="project-card"><div class="project-name">${p.name||'নামহীন'}</div><div class="project-meta">সেভ: ${new Date(p.savedAt).toLocaleString('bn-BD')} | জেলা: ${p.district||'—'} | আয়তন: ${p['total-area']||'?'} sqft</div><div class="project-actions"><button class="btn btn-primary btn-sm" onclick="loadProject(${i})">📂 লোড</button><button class="btn btn-danger btn-sm" onclick="deleteProject(${i})">🗑️ মুছুন</button></div></div>`).join('');}
+  }catch(e){}
+  g('loadModal').classList.add('show');
 }
-function updateCheckProgress() {
-  checkDone = Object.values(checklistState).filter(Boolean).length;
-  if(document.getElementById('checklist-done')) document.getElementById('checklist-done').textContent = checkDone;
-  const bar = document.getElementById('checklist-bar');
-  if(bar) bar.style.width = (checkTotal>0?Math.round(checkDone/checkTotal*100):0)+'%';
+function closeModal(){g('loadModal').classList.remove('show');}
+function loadProject(i){
+  try{const arr=JSON.parse(localStorage.getItem('nirman-v3')||'[]');const p=arr[i];if(!p)return;
+    Object.keys(p).forEach(k=>{if(k==='laborData'||k==='savedAt'||k==='name')return;const el=g(k);if(el)el.value=p[k];});
+    if(p.laborData){laborData=p.laborData;renderLaborList();}
+    if(p.division){g('division').value=p.division;updateDistricts();}
+    setTimeout(()=>{if(p.district){g('district').value=p.district;updateUpazilas();}
+      setTimeout(()=>{if(p.upazila)g('upazila').value=p.upazila;
+        if(p['bldg-cat']){g('bldg-cat').value=p['bldg-cat'];filterBuildingTypes();}
+        setTimeout(()=>{if(p['bldg-type'])g('bldg-type').value=p['bldg-type'];renderSpecialFeatures();recalculate();},100);},100);},100);
+    closeModal();alert('✅ প্রজেক্ট লোড হয়েছে!');
+  }catch(e){alert('লোড ব্যর্থ।');}
 }
+function deleteProject(i){if(!confirm('মুছে ফেলবেন?'))return;try{const arr=JSON.parse(localStorage.getItem('nirman-v3')||'[]');arr.splice(i,1);localStorage.setItem('nirman-v3',JSON.stringify(arr));openLoadModal();}catch(e){}}
 
-// Compare
-function saveToCompare() {
-  if(compareProjects.length>=10) { alert('সর্বোচ্চ ১০টি প্রজেক্ট তুলনা করা যাবে।'); return; }
-  const p = {
-    name: '# ' + (compareProjects.length+1) + ' — ' + (document.getElementById('district').value||'অজ্ঞাত'),
-    area: document.getElementById('total-area').value,
-    floors: document.getElementById('floors').value,
-    type: document.getElementById('bldg-type').options[document.getElementById('bldg-type').selectedIndex].text,
-    quality: document.getElementById('quality').options[document.getElementById('quality').selectedIndex].text,
-    total: lastTotal,
-    perSqft: lastTotal / (+document.getElementById('total-area').value||1),
-    time: (document.getElementById('est-months')||{}).textContent||'?',
-  };
-  compareProjects.push(p);
-  renderCompare();
-  savedCount++;
-}
-function clearCompare() { compareProjects = []; renderCompare(); }
-function renderCompare() {
-  const cont = document.getElementById('compare-container');
-  if(!cont) return;
-  if(!compareProjects.length) { cont.innerHTML = '<div class="alert alert-info" style="margin:0;">প্রজেক্ট হিসাব করুন, তারপর যোগ করুন।</div>'; return; }
-  const minTotal = Math.min(...compareProjects.map(p=>p.total));
-  const maxTotal = Math.max(...compareProjects.map(p=>p.total));
-  let html = `<div style="overflow-x:auto;"><table class="compare-table"><thead><tr>
-    <th>প্রজেক্ট</th><th>ধরণ</th><th>আয়তন</th><th>তলা</th><th>মান</th><th>মোট খরচ</th><th>প্রতি sqft</th><th>সময়</th>
-  </tr></thead><tbody>`;
-  compareProjects.forEach(p => {
-    const isBest = p.total===minTotal;
-    const isWorst = p.total===maxTotal && compareProjects.length>1;
-    html += `<tr>
-      <td style="font-weight:600;">${p.name}</td>
-      <td>${p.type.substring(0,10)}</td>
-      <td>${p.area} sqft</td>
-      <td>${p.floors}</td>
-      <td>${p.quality.split(' ')[0]}</td>
-      <td class="${isBest?'best':isWorst?'worst':''}">৳ ${Math.round(p.total).toLocaleString()} ${isBest?'✅':isWorst?'❌':''}</td>
-      <td>৳ ${Math.round(p.perSqft).toLocaleString()}</td>
-      <td>${p.time}</td>
-    </tr>`;
-  });
-  html += '</tbody></table></div>';
-  cont.innerHTML = html;
-}
+// EXPORT
+function exportCSV(){const mats=calcMaterials(Math.max(0,+(g('total-area')?.value||0)));const rows=[['উপকরণ','পরিমাণ','একক','একক মূল্য (৳)','মোট খরচ (৳)']];mats.forEach(m=>rows.push([m.name,m.qty,m.unit,m.rate,m.total]));const csv=rows.map(r=>r.join(',')).join('\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='nirman-v3.csv';a.click();URL.revokeObjectURL(url);}
+function exportPDF(){alert('প্রিন্ট ডায়ালগ থেকে "Save as PDF" নির্বাচন করুন।');window.print();}
+function printReport(){showSection('report');setTimeout(()=>window.print(),400);}
+function shareReport(){if(navigator.clipboard)navigator.clipboard.writeText(window.location.href).then(()=>alert('🔗 লিংক কপি হয়েছে!'));else alert(window.location.href);}
 
-// Badges
-const badgeDefs = [
-  {id:'first',icon:'🏗️',name:'প্রথম হিসাব',desc:'প্রথম হিসাব সম্পন্ন',check:()=>calcCount>=1},
-  {id:'economy',icon:'💰',name:'সাশ্রয়ী নির্মাতা',desc:'১০ লাখের নিচে',check:()=>lastTotal>0&&lastTotal<1000000},
-  {id:'bigproject',icon:'🏙️',name:'বড় প্রজেক্ট',desc:'১ কোটির উপরে',check:()=>lastTotal>=10000000},
-  {id:'solar',icon:'☀️',name:'সবুজ নির্মাতা',desc:'সোলার যোগ করেছেন',check:()=>(+document.getElementById('solar-kw').value||0)>0},
-  {id:'multi',icon:'📊',name:'তুলনাবিদ',desc:'৩টি প্রজেক্ট তুলনা',check:()=>compareProjects.length>=3},
-  {id:'location',icon:'📍',name:'লোকেশন মাস্টার',desc:'জেলা নির্বাচন করেছেন',check:()=>!!document.getElementById('district').value},
-  {id:'checklist',icon:'✅',name:'মান নিশ্চয়তা',desc:'৫০% চেকলিস্ট সম্পন্ন',check:()=>checkTotal>0&&checkDone/checkTotal>=0.5},
-  {id:'hospital',icon:'🏥',name:'হেলথকেয়ার বিশেষজ্ঞ',desc:'হাসপাতাল হিসাব করেছেন',check:()=>document.getElementById('bldg-type').value==='1.68'},
-];
-function checkBadges() {
-  badgeDefs.forEach(b => { if(b.check()) badgesEarned.push(b.id); });
-  badgesEarned = [...new Set(badgesEarned)];
-  if(document.getElementById('stat-calcs')) document.getElementById('stat-calcs').textContent = calcCount;
-  if(document.getElementById('stat-projects')) document.getElementById('stat-projects').textContent = savedCount;
-  if(document.getElementById('stat-badges')) document.getElementById('stat-badges').textContent = badgesEarned.length;
-}
-function renderBadges() {
-  const cont = document.getElementById('badge-grid');
-  if(!cont) return;
-  cont.innerHTML = badgeDefs.map(b => {
-    const earned = badgesEarned.includes(b.id);
-    return `<div class="badge-item ${earned?'earned':'locked'}">
-      <div class="badge-icon">${b.icon}</div>
-      <div class="badge-name">${b.name}</div>
-      <div class="badge-desc">${earned?'✅ অর্জিত':'🔒 '+b.desc}</div>
-    </div>`;
-  }).join('');
-  if(document.getElementById('stat-badges')) document.getElementById('stat-badges').textContent = badgesEarned.length;
-}
-
-// Report
-function renderReport() {
-  const el = document.getElementById('detailed-breakdown');
-  const rd = document.getElementById('report-date');
-  if(rd) rd.textContent = 'তারিখ: '+new Date().toLocaleDateString('bn-BD')+' | এলাকা: '+(document.getElementById('district').value||'নির্বাচিত নয়');
-  if(!el) return;
-  const sqft = +document.getElementById('total-area').value||0;
-  const baseRate = +document.getElementById('base-rate').value||2200;
-  const cfactor = +document.getElementById('config-factor').value||1;
-  const baseCost = sqft*baseRate*cfactor;
-  const vat = +document.getElementById('vat').value||15;
-  const cont = +document.getElementById('contingency').value||5;
-  const mar = +document.getElementById('margin').value||10;
-  el.innerHTML = `
-    <div class="breakdown-row"><span>মূল নির্মাণ (${sqft.toLocaleString()} sqft × ৳${baseRate} × ${cfactor.toFixed(2)})</span><span>${fmt(baseCost)}</span></div>
-    <div class="breakdown-row"><span>ভ্যাট (${vat}%) + কন্টিনজেন্সি (${cont}%) + মার্জিন (${mar}%)</span><span id="report-vat-line">—</span></div>
-    <div class="breakdown-row"><span>সরকারি ও আইনি ফি</span><span id="report-govt-line">—</span></div>
-    <div class="breakdown-row total"><span>সর্বমোট</span><span>${fmt(lastTotal)}</span></div>
-    <div style="margin-top:8px; font-size:12px; color:var(--text-muted);">প্রতি sqft গড়: <strong>${fmt(sqft>0?lastTotal/sqft:0)}</strong></div>
-  `;
-  const rvl = document.getElementById('report-vat-line');
-  const rgl = document.getElementById('report-govt-line');
-  const g = id => document.getElementById(id)?.textContent?.replace('৳ ','').replace(/,/g,'')||'0';
-  if(rvl) rvl.textContent = document.getElementById('br-vat').textContent||'—';
-  if(rgl) rgl.textContent = document.getElementById('br-govt').textContent||'—';
-}
-
-// QR Code
-function generateQR() {
-  const cont = document.getElementById('qr-code');
-  if(!cont) return;
-  cont.innerHTML = '';
-  try {
-    const data = `নির্মাণ হিসাব | খরচ: ৳${Math.round(lastTotal).toLocaleString()} | sqft: ${document.getElementById('total-area').value} | ${new Date().toLocaleDateString('bn-BD')}`;
-    if(typeof QRCode !== 'undefined') {
-      new QRCode(cont, {text:data, width:120, height:120});
-    } else {
-      cont.innerHTML = '<div style="width:120px;height:120px;border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-muted);text-align:center;">QR লোডিং...</div>';
-    }
-  } catch(e) { cont.innerHTML = '<div style="padding:20px; font-size:11px; color:var(--text-muted);">QR উপলব্ধ নয়</div>'; }
-}
-
-// Loan & Solar
-function calcLoan() {
-  const P = +document.getElementById('loan-amt').value||0;
-  const r = (+document.getElementById('loan-rate').value||9)/100/12;
-  const n = (+document.getElementById('loan-years').value||15)*12;
-  if(!P||!r) return;
-  const emi = P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
-  const total = emi*n;
-  if(document.getElementById('emi-val')) document.getElementById('emi-val').textContent = '৳ '+Math.round(emi).toLocaleString();
-  if(document.getElementById('loan-details')) document.getElementById('loan-details').textContent = `মোট পরিশোধ: ৳ ${Math.round(total).toLocaleString()} | সুদ: ৳ ${Math.round(total-P).toLocaleString()}`;
-}
-function calcSolarROI() {
-  const kw = +document.getElementById('solar-kw').value||0;
-  if(!kw) { const r = document.getElementById('solar-roi-result'); if(r) r.innerHTML = 'সোলার kW দিন →'; return; }
-  const cost = kw*80000;
-  const monthly = (+document.getElementById('monthly-bill').value||5000)*(+document.getElementById('solar-pct').value||70)/100;
-  const years = cost/(monthly*12);
-  const r = document.getElementById('solar-roi-result');
-  if(r) r.innerHTML = `<div style="font-weight:700; font-size:15px; color:var(--primary);">ROI: ${years.toFixed(1)} বছর</div><div style="font-size:11px; color:var(--text-muted);">ইনস্টল: ৳ ${cost.toLocaleString()}<br>মাসিক সঞ্চয়: ৳ ${Math.round(monthly).toLocaleString()}</div>`;
-}
-
-// Save/Load
-function saveProject() {
-  const data = {
-    area: document.getElementById('total-area').value,
-    floors: document.getElementById('floors').value,
-    district: document.getElementById('district').value,
-    btype: document.getElementById('bldg-type').value,
-    quality: document.getElementById('quality').value,
-    baseRate: document.getElementById('base-rate').value,
-    total: lastTotal,
-    labor: laborData,
-    savedAt: new Date().toISOString()
-  };
-  try {
-    const projects = JSON.parse(localStorage.getItem('nirman-v4-projects')||'[]');
-    projects.push(data); savedCount++;
-    localStorage.setItem('nirman-v4-projects', JSON.stringify(projects.slice(-10)));
-    const ind = document.getElementById('save-indicator');
-    if(ind) { ind.textContent = '✅ সেভ হয়েছে'; setTimeout(()=>{ind.textContent='● অটো-সেভ চালু';},2000); }
-    checkBadges();
-  } catch(e) { alert('সেভ করতে সমস্যা হয়েছে।'); }
-}
-function loadProject() {
-  try {
-    const projects = JSON.parse(localStorage.getItem('nirman-v4-projects')||'[]');
-    if(!projects.length) { alert('কোনো সেভ করা প্রজেক্ট নেই।'); return; }
-    const last = projects[projects.length-1];
-    document.getElementById('total-area').value = last.area||2000;
-    document.getElementById('floors').value = last.floors||3;
-    document.getElementById('bldg-type').value = last.btype||'1.0';
-    document.getElementById('quality').value = last.quality||'1.0';
-    document.getElementById('base-rate').value = last.baseRate||2200;
-    if(last.labor) laborData = last.labor;
-    renderLaborList(); renderSpecialFeatures(); renderFloorFinish(); recalculate();
-    alert('প্রজেক্ট লোড হয়েছে! (' + new Date(last.savedAt).toLocaleDateString('bn-BD') + ')');
-  } catch(e) { alert('লোড করতে সমস্যা হয়েছে।'); }
-}
-function exportCSV() {
-  const mats = calcMaterials(+document.getElementById('total-area').value||0);
-  const rows = [['উপকরণ','পরিমাণ','একক','দর','মোট']];
-  mats.forEach(m => rows.push([m.n,m.qty,m.u,m.r,m.total]));
-  const csv = rows.map(r => r.join(',')).join('\n');
-  const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'nirman_material.csv'; a.click();
-}
-function exportPDF() { alert('প্রিন্ট ডায়ালগ থেকে "Save as PDF" সিলেক্ট করুন।'); window.print(); }
-function printReport() { window.print(); }
-function shareReport() {
-  const txt = `নির্মাণ হিসাব রিপোর্ট\nমোট খরচ: ৳${Math.round(lastTotal).toLocaleString()}\nআয়তন: ${document.getElementById('total-area').value} sqft\nতারিখ: ${new Date().toLocaleDateString('bn-BD')}`;
-  if(navigator.clipboard) { navigator.clipboard.writeText(txt).then(()=>alert('কপি হয়েছে!')); }
-  else alert(txt);
-}
-
-// Init
-document.addEventListener('DOMContentLoaded', () => {
-  try {
-    const theme = localStorage.getItem('nirman-theme')||'light';
-    document.documentElement.setAttribute('data-theme', theme);
-    if(theme==='dark') document.getElementById('themeBtn').classList.add('dark');
-  } catch(e){}
-  renderLaborList();
-  renderSpecialFeatures();
-  renderFloorFinish();
-  calcLoan();
-  recalculate();
-  document.getElementById('report-date') && (document.getElementById('report-date').textContent = 'তারিখ: '+new Date().toLocaleDateString('bn-BD'));
-  // Auto-save every 2 min
-  setInterval(() => { try { localStorage.setItem('nirman-v4-auto', JSON.stringify({total:lastTotal,ts:Date.now()})); } catch(e){} }, 120000);
+// INIT
+document.addEventListener('DOMContentLoaded',()=>{
+  filterBuildingTypes();renderLaborList();renderSpecialFeatures();recalculate();
 });
 </script>
 </body>
